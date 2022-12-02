@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour {
     public float Speed = 1.0f;
-    public Vector2 Direction = new Vector2(0.0f, 1.0f);
 
-    private void Move(Vector2 distance) {
-
+    private void Move(float distance) {
+        this.transform.position += transform.up * distance;
     }
 
-    private void Start() {}
+    private void Start() {
+        
+    }
 
     private void Update() {
-        Move(Direction * Speed * Time.deltaTime);
+        Move(Speed * Time.deltaTime);
     }
 }
