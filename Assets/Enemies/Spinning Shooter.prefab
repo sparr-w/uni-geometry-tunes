@@ -271,14 +271,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isFiring: 1
   RotationSpeed: 0.1
-  ProjectileType: {fileID: 4615904167542275884, guid: ba4868d984963eb47ac8ce17f130bcf5, type: 3}
+  ProjectileType: {fileID: 0}
   ProjectileSpeed: 3.5
   ProjectileScale: {x: 0.3, y: 0.3}
   ShotDelay: 0.2
-  shootLeft: 1
-  shootRight: 1
-  shootUp: 1
-  shootDown: 1
+  shootLeft: 0
+  shootRight: 0
+  shootUp: 0
+  shootDown: 0
 --- !u!1 &8230933574841109249
 GameObject:
   m_ObjectHideFlags: 0

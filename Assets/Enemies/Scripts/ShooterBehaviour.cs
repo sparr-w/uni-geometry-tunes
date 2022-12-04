@@ -45,7 +45,7 @@ public class ShooterBehaviour : MonoBehaviour {
         }
     }
 
-    private Projectile FireProjectile(Vector3? localPos = null, Vector3? localRot = null) {
+    private Projectile FireProjectile(Vector3? localPos = null, Vector3? localRot = null) { // could make global?
         if (localPos == null) localPos = new Vector3(0.0f, 0.0f, 0.0f);
         if (localRot == null) localRot = new Vector3(0.0f, 0.0f, 0.0f);
 

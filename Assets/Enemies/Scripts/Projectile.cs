@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour {
-    private float speed = 1.0f;
+    public float Speed = 1.0f;
 
     public Projectile Init(float speed = 1.0f) {
-        this.speed = speed;
+        this.Speed = speed;
         return this;
     }
 
@@ -19,6 +19,6 @@ public class Projectile : MonoBehaviour {
     }
 
     private void Update() {
-        Move(speed * Time.deltaTime);
+        Move(Speed * Time.deltaTime);
     }
 }
