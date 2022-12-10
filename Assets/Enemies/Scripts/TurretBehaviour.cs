@@ -4,25 +4,18 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
-public class TurretBehaviour : MonoBehaviour {
-    public float ShotDelay = 0.5f;
-    public Projectile ProjectileType;
-    public float ProjectileSpeed = 0.5f;
-    public Vector2 ProjectileScale = new Vector2(1.0f, 1.0f);
-    
+public class TurretBehaviour : ShooterBehaviour {
     [SerializeField] private EnemyHandler _handler;
-    private PlayerController[] players; // pass through, eventually
-    private bool isFiring = false;
-    private float projectileRot = 0.0f;
-    private Transform barrelComponent;
-    
-    private void Start() {
-        isFiring = true;
-        StartCoroutine(Shoot());
-        
-        barrelComponent = transform.GetChild(0).GetChild(0);
-    }
+    private PlayerController[] players; // this should be a pass through when initialising rather than calling upon _handler
 
+    private Transform barrelComponent;
+    private float barrelRotation = 0.0f;
+
+    void Start() {
+        StartCoroutine(Shoot());
+        barrelComponent = this.transform.GetChild(0).transform.GetChild(0); // this should, if the structure of turrets isn't tampered with, find the barrel component
+    }
+    
     private PlayerController TargetClosest() {
         int closestIndex = 0;
         
@@ -34,8 +27,18 @@ public class TurretBehaviour : MonoBehaviour {
         
         return _handler.Players[closestIndex];
     }
+    
+    public override IEnumerator Shoot() {
+        yield return 0;
+        
+        while (isFiring) {
+            FireProjectile(new Vector3(0.0f, 0.0f, 0.0f), new Vector3(0.0f, 0.0f, barrelRotation));
 
-    private Vector2 Move(Vector2? distance) {
+            yield return new WaitForSeconds(ShotDelay);
+        }
+    }
+    
+    public override Vector2 Move(Vector2? distance) {
         
         
         // rotate barrel to face the player
@@ -45,39 +48,13 @@ public class TurretBehaviour : MonoBehaviour {
                        new Vector3(this.transform.position.x, this.transform.position.y, 0.0f);
         diff.Normalize();
 
-        projectileRot = (Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg) - 90.0f;
+        barrelRotation = (Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg) - 90.0f;
 
-        barrelComponent.transform.localEulerAngles = new Vector3(0.0f, 0.0f, projectileRot);
+        barrelComponent.transform.localEulerAngles = new Vector3(0.0f, 0.0f, barrelRotation);
         
         return new Vector2(this.transform.position.x, this.transform.position.y);
     }
     
-    private IEnumerator Shoot() {
-        yield return 0;
-        
-        while (isFiring) {
-            FireProjectile(new Vector3(0.0f, 0.0f, 0.0f), new Vector3(0.0f, 0.0f, projectileRot));
-
-            yield return new WaitForSeconds(ShotDelay);
-        }
-    }
-    
-    private Projectile FireProjectile(Vector3? localPos = null, Vector3? localRot = null) { // could make global?
-        if (localPos == null) localPos = new Vector3(0.0f, 0.0f, 0.0f);
-        if (localRot == null) localRot = new Vector3(0.0f, 0.0f, 0.0f);
-
-        Projectile proj = Instantiate(ProjectileType, this.transform);
-        proj.Init(ProjectileSpeed);
-        
-        proj.transform.localPosition = localPos.Value;
-        proj.transform.localEulerAngles = localRot.Value;
-
-        proj.transform.SetParent(null);
-        proj.transform.localScale = new Vector3(ProjectileScale.x, ProjectileScale.y, 1.0f);
-
-        return proj;
-    }
-
     private void Update() {
         Move(new Vector2(0.0f, 0.0f));
     }

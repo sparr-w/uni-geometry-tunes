@@ -5,47 +5,24 @@ using UnityEngine;
 
 public class ShooterBehaviour : MonoBehaviour {
     public bool isFiring = true;
-    
-    [Header("Shooter Behaviour")]
-    public float RotationSpeed = 0.1f;
-    
+
     [Header("Shooting Behaviour")]
     public Projectile ProjectileType;
     public float ProjectileSpeed = 3.5f;
     public Vector2 ProjectileScale = new Vector2(.3f, .3f);
     public float ShotDelay = 0.2f;
-    [SerializeField] private bool shootLeft, shootRight, shootUp, shootDown;
-
-    void Start() {
-        StartCoroutine(Shoot());
-        
-        if (shootUp) transform.GetChild(0).gameObject.SetActive(true);
-        else transform.GetChild(0).gameObject.SetActive(false);
-        
-        if (shootLeft) transform.GetChild(1).gameObject.SetActive(true);
-        else transform.GetChild(1).gameObject.SetActive(false);
-        
-        if (shootDown) transform.GetChild(2).gameObject.SetActive(true);
-        else transform.GetChild(2).gameObject.SetActive(false);
-        
-        if (shootRight) transform.GetChild(3).gameObject.SetActive(true);
-        else transform.GetChild(3).gameObject.SetActive(false);
-    }
-
-    private IEnumerator Shoot() {
+    
+    public virtual IEnumerator Shoot() {
         yield return 0;
         
         while (isFiring) {
-            if (shootUp) FireProjectile(new Vector3(0.0f, 0.5f, 0.0f));
-            if (shootLeft) FireProjectile(new Vector3(-0.5f, 0.0f, 0.0f), new Vector3(0.0f, 0.0f, 90.0f));
-            if (shootDown) FireProjectile(new Vector3(0.0f, -0.5f, 0.0f), new Vector3(0.0f, 0.0f, 180.0f));
-            if (shootRight) FireProjectile(new Vector3(0.5f, 0.0f, 0.0f), new Vector3(0.0f, 0.0f, 270.0f));
+            FireProjectile(new Vector3(0.0f, 0.5f, 0.0f));
 
             yield return new WaitForSeconds(ShotDelay);
         }
     }
 
-    private Projectile FireProjectile(Vector3? localPos = null, Vector3? localRot = null) { // could make global?
+    protected Projectile FireProjectile(Vector3? localPos = null, Vector3? localRot = null) { // could make global?
         if (localPos == null) localPos = new Vector3(0.0f, 0.0f, 0.0f);
         if (localRot == null) localRot = new Vector3(0.0f, 0.0f, 0.0f);
 
@@ -61,11 +38,13 @@ public class ShooterBehaviour : MonoBehaviour {
         return proj;
     }
 
-    private void Move() {
-        this.transform.eulerAngles += Vector3.forward * RotationSpeed;
-    }
+    public virtual Vector2 Move(Vector2? distance) {
+        if (distance == null) distance = new Vector2(0.0f, 0.0f);
 
-    void Update() {
-        Move();
+        Vector3 newPos = new Vector3(this.transform.position.x + distance.Value.x,
+            this.transform.position.y + distance.Value.y,
+            this.transform.position.z);
+
+        return this.transform.position = newPos;
     }
 }

@@ -178,7 +178,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8230933574818072440}
   - component: {fileID: 8230933574818072443}
-  - component: {fileID: 8230933574818072442}
+  - component: {fileID: 7012464332200796222}
   m_Layer: 0
   m_Name: Spinning Shooter
   m_TagString: Untagged
@@ -257,7 +257,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &8230933574818072442
+--- !u!114 &7012464332200796222
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -266,15 +266,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 8230933574818072445}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73b4d325535666a418a6d3fae3d3f518, type: 3}
+  m_Script: {fileID: 11500000, guid: 66abb2b6f086eb24693195c4a9bd4b84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isFiring: 1
-  RotationSpeed: 0.1
   ProjectileType: {fileID: 0}
   ProjectileSpeed: 3.5
   ProjectileScale: {x: 0.3, y: 0.3}
   ShotDelay: 0.2
+  rotationSpeed: 0.1
   shootLeft: 0
   shootRight: 0
   shootUp: 0
