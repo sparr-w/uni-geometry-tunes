@@ -11,6 +11,8 @@ public class Laser : Projectile {
     private Vector2 startPos;
     
     private float chargeProgress = 0.0f;
+    private float beamHideTimeframe = 0.15f;
+    private float lifetime = 1.0f;
 
     private void Start() {
         beamComponent = this.transform.GetChild(0); // this should get the expanding beam part if the structure isn't tampered with
@@ -30,6 +32,8 @@ public class Laser : Projectile {
     
     // expand in size, becoming more opaque and clear it is going to "blast"
     private bool Charge(float increment) {
+        if (chargeProgress >= 1.0f) return true;
+        
         chargeProgress += increment;
         chargeProgress = chargeProgress > 1.0f ? 1.0f : chargeProgress;
 
@@ -43,13 +47,31 @@ public class Laser : Projectile {
             beamRendererComponent.color.b,
             newOpacity);
         
-        if (chargeProgress >= 1.0f) Shoot();
-        return chargeProgress >= 1.0f;
+        if (chargeProgress >= 1.0f) StartCoroutine(nameof(Shoot));
+        return false;
     }
     
     // "blast", everything disappears briefly before a solid beam appears, dealing damage
-    private void Shoot() {
+    private IEnumerator Shoot() {
+        beamRendererComponent.color = new Color(0.0f, 0.0f, 0.0f, 0.0f); // hide the beam temporarily
+
+        yield return new WaitForSeconds(beamHideTimeframe);
+
+        StartCoroutine(nameof(Blast));
+
+        yield return null;
+    }
+
+    private IEnumerator Blast() {
+        StopCoroutine(nameof(Shoot));
+        
         beamRendererComponent.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+
+        yield return new WaitForSeconds(lifetime);
+        
+        Destroy(this.gameObject);
+
+        yield return null;
     }
     
     // the beam should stick the barrel it is firing from, so it may need to move with owner
