@@ -5,10 +5,8 @@ using UnityEngine;
 public class SpinShooterBehaviour : ShooterBehaviour {
     [SerializeField] private float rotationSpeed = 0.1f;
     [SerializeField] private bool shootLeft, shootRight, shootUp, shootDown;
-    
-    private void Start() {
-        StartCoroutine(Shoot());
-        
+
+    private void ShowHideBarrels() {
         if (shootUp) transform.GetChild(0).gameObject.SetActive(true);
         else transform.GetChild(0).gameObject.SetActive(false);
         
@@ -22,7 +20,19 @@ public class SpinShooterBehaviour : ShooterBehaviour {
         else transform.GetChild(3).gameObject.SetActive(false);
     }
 
-    public override IEnumerator Shoot() {
+    public SpinShooterBehaviour Init() {
+        shootDown = shootLeft = shootRight = shootUp = true;
+        
+        StartCoroutine(Shoot());
+
+        return this;
+    }
+    
+    private void Start() {
+        ShowHideBarrels();
+    }
+
+    protected override IEnumerator Shoot() {
         yield return 0;
         
         while (isFiring) {
@@ -35,13 +45,17 @@ public class SpinShooterBehaviour : ShooterBehaviour {
         }
     }
 
-    public override Vector2 Move(Vector2? distance) {
+    protected override Vector3 Move(Vector2 distance) {
+        // spin around
         this.transform.localEulerAngles += Vector3.forward * rotationSpeed;
 
+        // move (if needs to move)
+        this.transform.position += new Vector3(distance.x, distance.y, 0.0f);
+        
         return this.transform.position;
     }
 
     private void Update() {
-        Move(new Vector2(0.0f, 0.0f));
+        Move(new Vector2(0.0f, 0.0f) * moveSpeed * Time.deltaTime);
     }
 }

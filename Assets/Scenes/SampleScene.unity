@@ -205,7 +205,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &797310081
 GameObject:
@@ -237,7 +237,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &797310083
 MonoBehaviour:
@@ -253,6 +253,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Players: []
   WormPrefab: {fileID: 100264899467274863, guid: 3dd12cf6f1482a44482a54da37cf6b24, type: 3}
+  SpinShootPrefab: {fileID: 8230933574818072440, guid: c5f74c91f1de03748a435ff74d217f83, type: 3}
+  TurretPrefab: {fileID: 8943915830154006105, guid: 8f3a43f400592e84ea242815e102c019, type: 3}
 --- !u!1001 &8555676420545811778
 PrefabInstance:
   m_ObjectHideFlags: 0

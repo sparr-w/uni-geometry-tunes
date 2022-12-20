@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemyHandler : MonoBehaviour {
     public PlayerController[] Players;
-    public Transform WormPrefab;
+    public Transform WormPrefab, SpinShootPrefab, TurretPrefab;
 
     private float colourHue = 1.0f;
     private float colourSaturation = 0.7f;
@@ -20,27 +20,61 @@ public class EnemyHandler : MonoBehaviour {
                 Players[i] = p[i].GetComponent(typeof(PlayerController)) as PlayerController;
         }
         
-        SpawnWorm();
+        SpawnWorm(new Vector2(-10.0f, 0.0f));
+        SpawnSpinningShooter(new Vector2(0.0f, 0.0f));
+        SpawnTurret(new Vector2(5.0f, 2.0f));
     }
 
-    public void SpawnTurret() {
+    private Color InnerColor {
+        get {
+            Color newColor = Color.HSVToRGB(colourHue, colourSaturation, colourBrightnessInner);
+            return newColor;
+        }
+    }
+
+    private Color OuterColor {
+        get {
+            Color newColor = Color.HSVToRGB(colourHue, colourSaturation, colourBrightnessOuter);
+            return newColor;
+        }
+    }
+
+    public Transform SpawnTurret(Vector2 spawnPos) {
+        Transform newShooter = Instantiate(TurretPrefab);
+        newShooter.transform.position = spawnPos;
         
-    }
-
-    public Transform SpawnWorm() {
-        Transform newWorm = Instantiate(WormPrefab);
-
-        WormBehaviour behaviourComponent = newWorm.GetComponent<WormBehaviour>();
-
         colourHue = Random.Range(0.0f, 1.0f);
-        Color newColor = Color.HSVToRGB(colourHue, colourSaturation, colourBrightnessOuter);
         
-        behaviourComponent.SetColor(newColor);
+        TurretBehaviour behaviourComponent = newShooter.GetComponent<TurretBehaviour>();
+        behaviourComponent.SetColor(OuterColor, InnerColor);
+        behaviourComponent.Init(Players);
+
+        return newShooter;
+    }
+
+    public Transform SpawnWorm(Vector2 spawnPos) {
+        Transform newWorm = Instantiate(WormPrefab);
+        newWorm.transform.position = spawnPos;
+        
+        colourHue = Random.Range(0.0f, 1.0f);
+        
+        WormBehaviour behaviourComponent = newWorm.GetComponent<WormBehaviour>();
+        behaviourComponent.SetColor(OuterColor);
+        behaviourComponent.Init();
 
         return newWorm;
     }
 
-    public void SpawnSpinningShooter() {
+    public Transform SpawnSpinningShooter(Vector2 spawnPos) {
+        Transform newShooter = Instantiate(SpinShootPrefab);
+        newShooter.transform.position = spawnPos;
         
+        colourHue = Random.Range(0.0f, 1.0f);
+        
+        SpinShooterBehaviour behaviourComponent = newShooter.GetComponent<SpinShooterBehaviour>();
+        behaviourComponent.SetColor(OuterColor, InnerColor);
+        behaviourComponent.Init();
+
+        return newShooter;
     }
 }

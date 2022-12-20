@@ -5,16 +5,22 @@ using UnityEngine;
 public class Enemy : MonoBehaviour {
     public SpriteRenderer[] OuterBodyParts, InnerBodyParts;
     
+    private Color outerBodyColor = Color.white;
+    public Color OuterBodyColor {
+        set { this.outerBodyColor = value; }
+        get { return this.outerBodyColor; }
+    }
+
     [Space(10)]
-    [SerializeField] protected float speed = 0.0f;
-
-    public virtual void Init() {}
-
+    [SerializeField] protected float moveSpeed = 0.0f;
+    
     public bool SetColor(Color outerColor) {
         if (OuterBodyParts.Length < 1) return false;
 
         foreach (SpriteRenderer part in OuterBodyParts)
             part.color = outerColor;
+
+        outerBodyColor = outerColor;
         
         return true;
     }
@@ -24,6 +30,8 @@ public class Enemy : MonoBehaviour {
 
         foreach (SpriteRenderer part in OuterBodyParts)
             part.color = outerColor;
+
+        outerBodyColor = outerColor;
 
         if (InnerBodyParts.Length > 0) {
             foreach (SpriteRenderer part in InnerBodyParts)

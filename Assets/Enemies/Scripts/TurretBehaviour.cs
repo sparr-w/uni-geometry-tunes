@@ -5,13 +5,17 @@ using Unity.Mathematics;
 using UnityEngine;
 
 public class TurretBehaviour : ShooterBehaviour {
-    [SerializeField] private EnemyHandler _handler;
-    private PlayerController[] players; // this should be a pass through when initialising rather than calling upon _handler
+    private PlayerController[] players;
 
     private Transform barrelComponent;
     private float barrelRotation = 0.0f;
 
-    void Start() {
+    public TurretBehaviour Init(PlayerController[] players) {
+        this.players = players;
+        return this;
+    }
+
+    private void Start() {
         StartCoroutine(Shoot());
         barrelComponent = this.transform.GetChild(0).transform.GetChild(0); // this should, if the structure of turrets isn't tampered with, find the barrel component
     }
@@ -19,16 +23,16 @@ public class TurretBehaviour : ShooterBehaviour {
     private PlayerController TargetClosest() {
         int closestIndex = 0;
         
-        for (int i = 1; i < _handler.Players.Length; i++) { // computing squared magnitudes is faster
-            if ((this.transform.position - _handler.Players[closestIndex].transform.position).sqrMagnitude <
-                (this.transform.position - _handler.Players[i].transform.position).sqrMagnitude)
+        for (int i = 1; i < players.Length; i++) { // computing squared magnitudes is faster
+            if ((this.transform.position - players[closestIndex].transform.position).sqrMagnitude <
+                (this.transform.position - players[i].transform.position).sqrMagnitude)
                 closestIndex = i;
         }
         
-        return _handler.Players[closestIndex];
+        return players[closestIndex];
     }
     
-    public override IEnumerator Shoot() {
+    protected override IEnumerator Shoot() {
         yield return 0;
         
         while (isFiring) {
@@ -38,7 +42,7 @@ public class TurretBehaviour : ShooterBehaviour {
         }
     }
     
-    public override Vector2 Move(Vector2? distance) {
+    protected override Vector3 Move(Vector2 distance) {
         
         
         // rotate barrel to face the player

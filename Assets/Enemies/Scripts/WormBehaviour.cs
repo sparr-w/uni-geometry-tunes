@@ -10,14 +10,13 @@ public class WormBehaviour : Enemy {
     [SerializeField] private float bodyPartGap = 0.0f;
     [SerializeField] private int bodyPartCount = 9;
 
-    private float posX = 0.0f, posY = 0.0f;
+    private float posX = 0.0f;
     private Vector2 startPos;
-
     private Transform[] bodyParts;
     private float bodyPartRadius = 1.0f;
 
-    public override void Init() {
-        
+    public WormBehaviour Init() {
+        return this;
     }
     
     /* old method, only moves from left to right
@@ -68,8 +67,8 @@ public class WormBehaviour : Enemy {
     }
 
     private void Start() {
-        startPos = new Vector2(this.transform.position.x, this.transform.position.y);
-
+        startPos = this.transform.position;
+        
         OuterBodyParts = new SpriteRenderer[bodyPartCount];
         OuterBodyParts[0] = transform.GetChild(0).GetComponent<SpriteRenderer>();
         
@@ -92,6 +91,6 @@ public class WormBehaviour : Enemy {
     }
 
     private void Update() {
-        Move(new Vector2(speed * Time.deltaTime, 0.0f));
+        Move(new Vector2(moveSpeed * Time.deltaTime, 0.0f));
     }
 }
