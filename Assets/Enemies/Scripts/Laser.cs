@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Laser : Projectile {
-    [SerializeField] private float finalWidth = 0.5f;
     [SerializeField] private float finalOpacity = 0.5f;
+    [SerializeField] private float beamLifetime = 1.0f;
 
     private Transform beamComponent;
     private SpriteRenderer beamRendererComponent;
-    private Vector2 startPos;
     
     private float chargeProgress = 0.0f;
-    private float beamHideTimeframe = 0.15f;
-    private float lifetime = 1.0f;
+    private const float beamHideTimeframe = 0.15f;
 
     private void Start() {
         beamComponent = this.transform.GetChild(0); // this should get the expanding beam part if the structure isn't tampered with
@@ -25,21 +23,15 @@ public class Laser : Projectile {
     }
     
     // appear during initialisation, in the correct position
-    public Laser Init(Vector2 _startPos) {
-        this.startPos = _startPos;
-        return this;
-    }
-    
+
     // expand in size, becoming more opaque and clear it is going to "blast"
     private bool Charge(float increment) {
         if (chargeProgress >= 1.0f) return true;
         
         chargeProgress += increment;
         chargeProgress = chargeProgress > 1.0f ? 1.0f : chargeProgress;
-
-        float newWidth = finalWidth * chargeProgress;
-        beamComponent.localScale = new Vector3(beamComponent.localScale.x,
-            newWidth, beamComponent.localScale.z);
+        
+        beamComponent.localScale = new Vector3(chargeProgress, beamComponent.localScale.y, beamComponent.localScale.z);
 
         float newOpacity = finalOpacity * chargeProgress;
         beamRendererComponent.color = new Color(beamRendererComponent.color.r,
@@ -64,10 +56,10 @@ public class Laser : Projectile {
 
     private IEnumerator Blast() {
         StopCoroutine(nameof(Shoot));
-        
-        beamRendererComponent.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
 
-        yield return new WaitForSeconds(lifetime);
+        beamRendererComponent.color = parentColor;
+
+        yield return new WaitForSeconds(beamLifetime);
         
         Destroy(this.gameObject);
 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -27,13 +28,18 @@ public class ShooterBehaviour : Enemy {
         if (localRot == null) localRot = new Vector3(0.0f, 0.0f, 0.0f);
 
         Projectile proj = Instantiate(ProjectileType, this.transform);
-        proj.Init(OuterBodyColor, ProjectileSpeed);
         
         proj.transform.localPosition = localPos.Value;
         proj.transform.localEulerAngles = localRot.Value;
-
         proj.transform.SetParent(null);
-        proj.transform.localScale = new Vector3(ProjectileScale.x, ProjectileScale.y, 1.0f);
+        if (proj is Laser) {
+            proj.transform.localScale = new Vector3(ProjectileScale.x, 1.0f, 1.0f);
+            proj.transform.SetParent(this.transform);
+            proj.transform.localPosition = new Vector3(0.0f, 0.0f, 0.01f); // centred, behind everything
+        } else proj.transform.localScale = new Vector3(ProjectileScale.x, ProjectileScale.y, 1.0f);
+        
+        proj.Init(ProjectileSpeed);
+        proj.SetColor(OuterBodyColor);
 
         return proj;
     }

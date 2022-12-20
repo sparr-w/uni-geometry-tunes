@@ -36,7 +36,7 @@ public class TurretBehaviour : ShooterBehaviour {
         yield return 0;
         
         while (isFiring) {
-            FireProjectile(new Vector3(0.0f, 0.0f, 0.0f), new Vector3(0.0f, 0.0f, barrelRotation));
+            FireProjectile(new Vector3(0.0f, 0.0f, 0.0f));
 
             yield return new WaitForSeconds(ShotDelay);
         }
@@ -54,7 +54,7 @@ public class TurretBehaviour : ShooterBehaviour {
 
         barrelRotation = (Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg) - 90.0f;
 
-        barrelComponent.transform.localEulerAngles = new Vector3(0.0f, 0.0f, barrelRotation);
+        transform.localEulerAngles = new Vector3(0.0f, 0.0f, barrelRotation);
         
         return new Vector2(this.transform.position.x, this.transform.position.y);
     }
