@@ -142,6 +142,7 @@ MonoBehaviour:
   ProjectileSpeed: 3.5
   ProjectileScale: {x: 0.3, y: 0.3}
   ShotDelay: 0.2
+  rotationRate: 0
 --- !u!58 &6868422945264083144
 CircleCollider2D:
   m_ObjectHideFlags: 0

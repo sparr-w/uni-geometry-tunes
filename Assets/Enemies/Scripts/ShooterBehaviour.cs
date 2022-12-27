@@ -8,10 +8,10 @@ public class ShooterBehaviour : Enemy {
     public bool isFiring = true;
 
     [Header("Shooting Behaviour")]
-    public Projectile ProjectileType;
-    public float ProjectileSpeed = 3.5f;
-    public Vector2 ProjectileScale = new Vector2(.3f, .3f);
-    public float ShotDelay = 0.2f;
+    [SerializeField] protected Projectile ProjectileType;
+    [SerializeField] protected float ProjectileSpeed = 3.5f;
+    [SerializeField] protected Vector2 ProjectileScale = new Vector2(.3f, .3f); 
+    [SerializeField] protected float ShotDelay = 0.2f;
     
     protected virtual IEnumerator Shoot() {
         yield return 0;

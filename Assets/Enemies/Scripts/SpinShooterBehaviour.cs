@@ -20,14 +20,28 @@ public class SpinShooterBehaviour : ShooterBehaviour {
         else transform.GetChild(3).gameObject.SetActive(false);
     }
 
-    public SpinShooterBehaviour Init() {
-        shootDown = shootLeft = shootRight = shootUp = true;
-        
-        StartCoroutine(Shoot());
+    #region Initializers
 
+    public SpinShooterBehaviour InitProjectiles(float shotDelay = 0.2f, float projSpeed = 1.0f, float projSize = 1.0f) {
+        this.ShotDelay = shotDelay;
+        
         return this;
     }
-    
+
+    public SpinShooterBehaviour Init(bool[] shotDirections, float spinSpeed = 1.0f) {
+        this.rotationSpeed = spinSpeed * rotationSpeed; // refactor
+        shootUp = shotDirections[0];
+        shootRight = shotDirections[1];
+        shootDown = shotDirections[2];
+        shootLeft = shotDirections[3];
+        
+        StartCoroutine(Shoot());
+        
+        return this;
+    }
+
+    #endregion
+
     private void Start() {
         ShowHideBarrels();
     }

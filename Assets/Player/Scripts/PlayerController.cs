@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
-    private float moveSpeed = 5.0f;
-    private float rotSpeed = 400.0f;
+    private float moveSpeed = 5.0f, rotSpeed = 400.0f;
     private float horizontalInput = 0.0f, verticalInput = 0.0f;
+    private int hitPoints = 10;
+    private bool damageImmune = true;
     private Transform bodyComponent;
 
     private void Start() {
@@ -14,6 +15,11 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void GetInput() {
+        if (hitPoints <= 0) { // stop receiving input and default to zero if the player is dead
+            verticalInput = horizontalInput = 0.0f;
+            return;
+        }
+        
         if (Input.GetKey(KeyCode.W)) verticalInput = 1.0f;
         else if (Input.GetKey(KeyCode.S)) verticalInput = -1.0f;
         else verticalInput = 0.0f;
@@ -71,16 +77,35 @@ public class PlayerController : MonoBehaviour {
         
         // rotate in the most optimal direction to face the direction of travel
         if (Mathf.Abs(verticalInput) > 0.2f || Mathf.Abs(horizontalInput) > 0.2f) {
-            if ((bodyRot + 180.0f >= bodyTargetRot && bodyRot <= bodyTargetRot) || 
+            if ((bodyRot + 180.0f >= bodyTargetRot && bodyRot <= bodyTargetRot) ||
                 (bodyRot + 180.0f >= bodyTargetRot + 360.0f && bodyRot <= bodyTargetRot + 360.0f))
                 bodyRot = bodyRot + rotSpeed * Time.deltaTime;
-            else
+                else
                 bodyRot = bodyRot - rotSpeed * Time.deltaTime;
 
-            bodyComponent.transform.localEulerAngles = new Vector3(0.0f, 0.0f, bodyRot);
+                bodyComponent.transform.localEulerAngles = new Vector3(0.0f, 0.0f, bodyRot);
         }
         
         return transform.position;
+    }
+
+    public bool DealDamage(int damage) {
+        if (damageImmune) return false; // can't deal damage to player, return that the hit wasn't received
+        
+        if (damage >= hitPoints) {
+            hitPoints = 0;
+            Die();
+        }
+        else {
+            hitPoints -= damage;
+        }
+
+        return true;
+    }
+
+    private void Die() {
+        // do some sort of simple death animation, explode? spin and shrink out of existence?
+        damageImmune = true; // don't need to take more damage, prevent multiple calls of function
     }
     
     private void Update() {

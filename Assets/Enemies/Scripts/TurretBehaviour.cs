@@ -5,10 +5,10 @@ using Unity.Mathematics;
 using UnityEngine;
 
 public class TurretBehaviour : ShooterBehaviour {
+    [SerializeField] private float rotationRate = 0.0f;
+    
     private PlayerController[] players;
-
     private Transform barrelComponent;
-    private float barrelRotation = 0.0f;
 
     public TurretBehaviour Init(PlayerController[] players) {
         this.players = players;
@@ -52,11 +52,21 @@ public class TurretBehaviour : ShooterBehaviour {
                        new Vector3(this.transform.position.x, this.transform.position.y, 0.0f);
         diff.Normalize();
 
-        barrelRotation = (Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg) - 90.0f;
+        float currentRotation = this.transform.localEulerAngles.z;
+        float targetRotation = (Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg) - 90.0f;
+    
+        // interpolating rotation so that if the enemy is using a laser or fast firing weaponry, it can be made weaker by rotating slowly
+        if (rotationRate > 0.0f) { // only interpolates if the rate is more than 0, 0 is default, snap to target
+            if ((currentRotation + 180.0f >= targetRotation && currentRotation <= targetRotation) ||
+                (currentRotation + 180.0f >= targetRotation + 360.0f && currentRotation <= targetRotation + 360.0f))
+                currentRotation = currentRotation + rotationRate * Time.deltaTime * 30.0f; // * 30.0f because the rate of change is so low
+            else
+                currentRotation = currentRotation - rotationRate * Time.deltaTime * 30.0f; // same * 30.0f the rate it too slow
+        } else currentRotation = targetRotation;
 
-        transform.localEulerAngles = new Vector3(0.0f, 0.0f, barrelRotation);
-        
-        return new Vector2(this.transform.position.x, this.transform.position.y);
+        this.transform.localEulerAngles = new Vector3(0.0f, 0.0f, currentRotation);
+
+        return this.transform.position;
     }
     
     private void Update() {
