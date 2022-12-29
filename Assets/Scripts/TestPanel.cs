@@ -1,12 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
+[System.Serializable]
+public struct SpawnConfigComponents {
+    public GameObject RandomSpawnComponent, ExactSpawnComponent;
+    
+    public TMP_InputField ExactSpawnX, ExactSpawnY;
+    public TMP_InputField RandomLowerX, RandomLowerY;
+    public TMP_InputField RandomUpperX, RandomUpperY;
+}
+
 public class TestPanel : MonoBehaviour {
+    [SerializeField] private EnemyHandler _enemyHandler;
     [Header("Components")]
     [SerializeField] private Image colourHandle;
+    [SerializeField] private SpawnConfigComponents spawnConfigComponents;
     
     private float defaultSpeed = 200.0f;
     private bool isActive = false, isMoving = false;
@@ -19,7 +31,7 @@ public class TestPanel : MonoBehaviour {
 
     private void Start() {
         rectTransform = this.GetComponent<RectTransform>();
-        
+
         HandleHue(0.0f);
     }
 
@@ -47,6 +59,10 @@ public class TestPanel : MonoBehaviour {
             }
 
             isMoving = true;
+            
+            UpdateExactSpawn();
+            UpdateLowerBounds();
+            UpdateUpperBounds();
             
             StartCoroutine(ShowPanel());
         }
@@ -134,6 +150,32 @@ public class TestPanel : MonoBehaviour {
 
     public void HandleHue(float value) {
         colourHandle.color = Color.HSVToRGB(value, 0.7f, 0.7f);
+    }
+
+    public void ToggleSpawnModifier(bool newValue) {
+        if (newValue == true) {
+            spawnConfigComponents.RandomSpawnComponent.SetActive(true);
+            spawnConfigComponents.ExactSpawnComponent.SetActive(false);
+        }
+        else {
+            spawnConfigComponents.RandomSpawnComponent.SetActive(false);
+            spawnConfigComponents.ExactSpawnComponent.SetActive(true);
+        }
+    }
+
+    public void UpdateExactSpawn() {
+        spawnConfigComponents.ExactSpawnX.text = _enemyHandler.SpawnLocationX;
+        spawnConfigComponents.ExactSpawnY.text = _enemyHandler.SpawnLocationY;
+    }
+
+    public void UpdateLowerBounds() {
+        spawnConfigComponents.RandomLowerX.text = _enemyHandler.SpawnLowerBoundsX;
+        spawnConfigComponents.RandomLowerY.text = _enemyHandler.SpawnLowerBoundsY;
+    }
+
+    public void UpdateUpperBounds() {
+        spawnConfigComponents.RandomUpperX.text = _enemyHandler.SpawnUpperBoundsX;
+        spawnConfigComponents.RandomUpperY.text = _enemyHandler.SpawnUpperBoundsY;
     }
     
     private void Update() {

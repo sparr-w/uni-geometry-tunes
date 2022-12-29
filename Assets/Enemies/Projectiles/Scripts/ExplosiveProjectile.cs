@@ -7,12 +7,6 @@ public class ExplosiveProjectile : Projectile {
     [SerializeField] private Projectile projectileType;
     [SerializeField] private int projectileCount = 0;
 
-    private Vector2 screenBounds;
-
-    private void Start() {
-        screenBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z));
-    }
-    
     private Projectile FireProjectile(Vector3? localPos = null, Vector3? localRot = null) { // copied behaviour from shooterbehaviour
         if (localPos == null) localPos = new Vector3(0.0f, 0.0f, 0.0f);
         if (localRot == null) localRot = new Vector3(0.0f, 0.0f, 0.0f);
@@ -46,8 +40,8 @@ public class ExplosiveProjectile : Projectile {
     }
     
     private void LateUpdate() {
-        if (Mathf.Abs(transform.position.x) >= Mathf.Abs(screenBounds.x) ||
-            Mathf.Abs(transform.position.y) >= Mathf.Abs(screenBounds.y))
+        if (Mathf.Abs(transform.position.x) >= Mathf.Abs(GlobalVariables.ScreenBounds.x) ||
+            Mathf.Abs(transform.position.y) >= Mathf.Abs(GlobalVariables.ScreenBounds.y))
             Explode();
     }
 }

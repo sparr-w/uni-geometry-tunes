@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour {
     [SerializeField] protected SpriteRenderer[] OuterBodyParts, InnerBodyParts;
-    
+
     private Color outerBodyColor = Color.white;
     public Color OuterBodyColor {
         set { this.outerBodyColor = value; }
@@ -12,7 +13,8 @@ public class Enemy : MonoBehaviour {
     }
 
     [Space(10)]
-    [SerializeField] protected float moveSpeed = 0.0f;
+    [SerializeField] protected float moveSpeedMultiplier = 0.0f;
+    protected float moveSpeed = 0.0f;
 
     public bool SetColor(Color[] newColors) {
         if (OuterBodyParts.Length < 1) return false;
@@ -30,8 +32,17 @@ public class Enemy : MonoBehaviour {
         return true;
     }
 
+    protected Vector3 MovePatternChase(Vector3 targetPos, float minDistance = 10.0f) {
+        float distance = Vector2.Distance(this.transform.position, targetPos);
+        
+        
+
+        return this.transform.position;
+    }
+    
     protected virtual Vector3 Move(Vector2 distance) {
-        return new Vector3(0.0f, 0.0f, 0.0f);
+        this.transform.position += new Vector3(distance.x, distance.y, 0.0f);
+        return this.transform.position;
     }
 
     private void OnTriggerEnter2D(Collider2D other) { // most enemies will have a trigger collider, so when the player crashes into them, he should take damage

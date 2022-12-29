@@ -5,11 +5,114 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class EnemyHandler : MonoBehaviour {
-    public PlayerController[] Players;
     [Header("Enemy Prefabs")] [SerializeField] private Transform WormPrefab;
     [SerializeField] private Transform SpinShootPrefab, TurretPrefab, BossPrefab;
+
+    private bool spawnRandom = true;
+    public bool SpawnRandom {
+        get { return spawnRandom; } set { spawnRandom = value; }
+    }
+    private Vector2 spawnLowerBounds, spawnUpperBounds;
+    public string SpawnLowerBoundsX {
+        get { return spawnLowerBounds.x + ""; }
+        set {
+            if (Single.TryParse(value, out float i)) {
+                float boundsX = Mathf.Abs(GlobalVariables.ScreenBounds.x);
+                
+                if (i >= spawnUpperBounds.x)
+                    spawnLowerBounds = new Vector2(spawnUpperBounds.x, spawnLowerBounds.y);
+                else if (i >= boundsX)
+                    spawnLowerBounds = new Vector2(boundsX, spawnLowerBounds.y);
+                else if (i <= -boundsX)
+                    spawnLowerBounds = new Vector2(-boundsX, spawnLowerBounds.y);
+                else
+                    spawnLowerBounds = new Vector2(i, spawnLowerBounds.y);
+            } else spawnLowerBounds = new Vector2(spawnLowerBounds.x, spawnLowerBounds.y);
+        }
+    }
+    public string SpawnLowerBoundsY {
+        get { return spawnLowerBounds.y + ""; }
+        set {
+            if (Single.TryParse(value, out float i)) {
+                float boundsY = Mathf.Abs(GlobalVariables.ScreenBounds.y);
+
+                if (i >= spawnUpperBounds.y)
+                    spawnLowerBounds = new Vector2(spawnLowerBounds.x, spawnUpperBounds.y);
+                else if (i >= boundsY)
+                    spawnLowerBounds = new Vector2(spawnLowerBounds.x, boundsY);
+                else if (i <= -boundsY)
+                    spawnLowerBounds = new Vector2(spawnLowerBounds.x, -boundsY);
+                else
+                    spawnLowerBounds = new Vector2(spawnLowerBounds.x, i);
+            } else spawnLowerBounds = new Vector2(spawnLowerBounds.x, spawnLowerBounds.y);
+        }
+    }
+    public string SpawnUpperBoundsX {
+        get { return spawnUpperBounds.x + ""; }
+        set {
+            if (Single.TryParse(value, out float i)) {
+                float boundsX = Mathf.Abs(GlobalVariables.ScreenBounds.x);
+
+                if (i <= spawnLowerBounds.x)
+                    spawnUpperBounds = new Vector2(spawnLowerBounds.x, spawnUpperBounds.y);
+                else if (i >= boundsX)
+                    spawnUpperBounds = new Vector2(boundsX, spawnUpperBounds.y);
+                else if (i <= -boundsX)
+                    spawnUpperBounds = new Vector2(-boundsX, spawnUpperBounds.y);
+                else
+                    spawnUpperBounds = new Vector2(i, spawnUpperBounds.y);
+            } else spawnUpperBounds = new Vector2(Mathf.Abs(GlobalVariables.ScreenBounds.x), spawnUpperBounds.y);
+        }
+    }
+    public string SpawnUpperBoundsY {
+        get { return spawnUpperBounds.y + ""; }
+        set {
+            if (Single.TryParse(value, out float i)) {
+                float boundsY = Mathf.Abs(GlobalVariables.ScreenBounds.y);
+
+                if (i <= spawnLowerBounds.y)
+                    spawnUpperBounds = new Vector2(spawnUpperBounds.x, spawnLowerBounds.y);
+                else if (i >= boundsY)
+                    spawnUpperBounds = new Vector2(spawnUpperBounds.x, boundsY);
+                else if (i <= -boundsY)
+                    spawnUpperBounds = new Vector2(spawnUpperBounds.x, -boundsY);
+                else
+                    spawnUpperBounds = new Vector2(spawnUpperBounds.x, i);
+            } else spawnUpperBounds = new Vector2(spawnUpperBounds.x, Mathf.Abs(GlobalVariables.ScreenBounds.y));
+        }
+    }
+    private Vector2 spawnLocation = new Vector2(0.0f, 0.0f);
+    public string SpawnLocationX {
+        get { return spawnLocation.x + ""; }
+        set {
+            if (Single.TryParse(value, out float i)) {
+                float boundsX = Mathf.Abs(GlobalVariables.ScreenBounds.x);
+                
+                if (i >= boundsX)
+                    spawnLocation = new Vector2(boundsX, spawnLocation.y);
+                else if (i <= -boundsX)
+                    spawnLocation = new Vector2(-boundsX, spawnLocation.y);
+                else
+                    spawnLocation = new Vector2(i, spawnLocation.y);
+            } else spawnLocation = new Vector2(0.0f, spawnLocation.y);
+        }
+    }
+    public string SpawnLocationY {
+        get { return spawnLocation.y + ""; }
+        set {
+            if (Single.TryParse(value, out float i)) {
+                float boundsY = Mathf.Abs(GlobalVariables.ScreenBounds.y);
+
+                if (i >= boundsY)
+                    spawnLocation = new Vector2(spawnLocation.x, boundsY);
+                else if (i <= -boundsY)
+                    spawnLocation = new Vector2(spawnLocation.x, -boundsY);
+                else
+                    spawnLocation = new Vector2(spawnLocation.x, i);
+            } else spawnLocation = new Vector2(spawnLocation.x, 0.0f);
+        }
+    }
     
-    private float colourHue = 1.0f;
     private float colourSaturation = 0.7f;
     private float colourBrightnessInner = 0.4f, colourBrightnessOuter = 0.7f;
     
@@ -24,19 +127,15 @@ public class EnemyHandler : MonoBehaviour {
     }
 
     private void Start() {
-        GameObject[] p = GameObject.FindGameObjectsWithTag("Player");
-        
-        if (p.Length != 0) {
-            Players = new PlayerController[p.Length];
-
-            for (int i = 0; i < p.Length; i++)
-                Players[i] = p[i].GetComponent(typeof(PlayerController)) as PlayerController;
-        }
+        spawnLowerBounds = new Vector2(-(Mathf.Abs(GlobalVariables.ScreenBounds.x)),
+            -(Mathf.Abs(GlobalVariables.ScreenBounds.y)));
+        spawnUpperBounds = new Vector2(Mathf.Abs(GlobalVariables.ScreenBounds.x),
+            Mathf.Abs(GlobalVariables.ScreenBounds.y));
     }
 
     private Color[] BodyColors { // [inner, outer]
         get {
-            float hue = colourOverride ? overriddenHue : colourHue;
+            float hue = colourOverride ? overriddenHue : Random.Range(0.0f, 1.0f);
             Color[] colors = {
                 Color.HSVToRGB(hue, colourSaturation, colourBrightnessInner),
                 Color.HSVToRGB(hue, colourSaturation, colourBrightnessOuter),
@@ -46,6 +145,18 @@ public class EnemyHandler : MonoBehaviour {
         }
     }
 
+    private Vector2 EnemySpawnPosition {
+        get {
+            if (spawnRandom) {
+                float posX = Random.Range(spawnLowerBounds.x, spawnUpperBounds.x);
+                float posY = Random.Range(spawnLowerBounds.y, spawnUpperBounds.y);
+                Vector2 loc = new Vector2(posX, posY);
+
+                return loc;
+            } else return spawnLocation;
+        }
+    }
+    
     #region Global Enemy Variables
 
     private float enemySpeedMultiplier = 1.0f;
@@ -72,39 +183,51 @@ public class EnemyHandler : MonoBehaviour {
     }
 
     private float spinnerRotationMultiplier = 1.0f;
-    public float SpinnerRotationMultiplier {
-        get { return spinnerRotationMultiplier; } set { spinnerRotationMultiplier = value; }
+    public string SpinnerRotationMultiplier {
+        get { return "" + spinnerRotationMultiplier; }
+        set {
+            if (Single.TryParse(value, out float i))
+                spinnerRotationMultiplier = i;
+            else spinnerRotationMultiplier = 1.0f;
+        }
     }
-
+    
     private float spinnerShotDelay = 0.2f;
-    public float SpinnerShotDelay {
-        get { return spinnerShotDelay; } set { spinnerShotDelay = value; }
+    public string SpinnerShotDelay {
+        get { return "" + spinnerShotDelay; }
+        set {
+            if (Single.TryParse(value, out float i))
+                spinnerShotDelay = i;
+            else spinnerShotDelay = 0.2f;
+        }
     }
-
+    
     private float spinnerProjSpeed = 1.0f;
-    public float SpinnerProjSpeed {
-        get { return spinnerProjSpeed; } set { spinnerProjSpeed = value; }
+    public string SpinnerProjSpeed {
+        get { return "" + spinnerProjSpeed; }
+        set {
+            if (Single.TryParse(value, out float i))
+                spinnerProjSpeed = i;
+            else spinnerProjSpeed = 0.2f;
+        }
     }
-
+    
     private float spinnerProjSize = 1.0f;
-    public float SpinnerProjSize {
-        get { return spinnerProjSize; } set { spinnerProjSize = value; }
+    public string SpinnerProjSize {
+        get { return "" + spinnerProjSize; }
+        set {
+            if (Single.TryParse(value, out float i))
+                spinnerProjSize = i;
+            else spinnerProjSize = 0.2f;
+        }
     }
     
     #endregion
     
-    public void SpawnSpinner() { // gotta refactor spinning shooters so that it's easier to construct them
-        float posX = Random.Range(-6.0f, 6.0f);
-        float posY = Random.Range(-5.0f, 5.0f);
-        SpawnSpinningShooter(new Vector2(posX, posY));
-    }
-    
-    public Transform SpawnSpinningShooter(Vector2 spawnPos) {
+    public Transform SpawnSpinningShooter(Vector2 spawnPos) { // gotta refactor spinning shooters so that it's easier to construct them
         Transform newShooter = Instantiate(SpinShootPrefab);
         newShooter.transform.position = spawnPos;
-        
-        colourHue = Random.Range(0.0f, 1.0f);
-        
+
         SpinShooterBehaviour behaviourComponent = newShooter.GetComponent<SpinShooterBehaviour>();
         behaviourComponent.SetColor(BodyColors);
         behaviourComponent.Init(spinnerDirections, spinnerRotationMultiplier);
@@ -112,16 +235,15 @@ public class EnemyHandler : MonoBehaviour {
 
         return newShooter;
     }
+    public void SpawnSpinShooter() { SpawnSpinningShooter(EnemySpawnPosition); }
 
     public Transform SpawnTurret(Vector2 spawnPos) {
         Transform newShooter = Instantiate(TurretPrefab);
         newShooter.transform.position = spawnPos;
         
-        colourHue = Random.Range(0.0f, 1.0f);
-        
         TurretBehaviour behaviourComponent = newShooter.GetComponent<TurretBehaviour>();
         behaviourComponent.SetColor(BodyColors);
-        behaviourComponent.Init(Players);
+        behaviourComponent.Init();
 
         return newShooter;
     }
@@ -129,8 +251,6 @@ public class EnemyHandler : MonoBehaviour {
     public Transform SpawnWorm(Vector2 spawnPos) {
         Transform newWorm = Instantiate(WormPrefab);
         newWorm.transform.position = spawnPos;
-        
-        colourHue = Random.Range(0.0f, 1.0f);
         
         WormBehaviour behaviourComponent = newWorm.GetComponent<WormBehaviour>();
         behaviourComponent.SetColor(BodyColors);
@@ -142,9 +262,7 @@ public class EnemyHandler : MonoBehaviour {
     public Transform SpawnBoss(Vector2 spawnPos) {
         Transform newBoss = Instantiate(BossPrefab);
         newBoss.transform.position = spawnPos;
-
-        colourHue = Random.Range(0.0f, 1.0f);
-
+        
         BossEnemy bossComponent = newBoss.GetComponent<BossEnemy>();
         bossComponent.SetColor(BodyColors);
 

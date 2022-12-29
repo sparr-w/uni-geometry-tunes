@@ -9,10 +9,13 @@ public class ShooterBehaviour : Enemy {
 
     [Header("Shooting Behaviour")]
     [SerializeField] protected Projectile ProjectileType;
-    [SerializeField] protected float ProjectileSpeed = 3.5f;
-    [SerializeField] protected Vector2 ProjectileScale = new Vector2(.3f, .3f); 
+    [SerializeField] protected float projSpeedMultiplier = 1.0f;
+    [SerializeField] protected float projScaleMultiplier = 1.0f;
     [SerializeField] protected float ShotDelay = 0.2f;
     
+    protected float projSpeed = 3.5f;
+    protected Vector2 projScale = new Vector2(.3f, .3f);
+
     protected virtual IEnumerator Shoot() {
         yield return 0;
         
@@ -33,12 +36,13 @@ public class ShooterBehaviour : Enemy {
         proj.transform.localEulerAngles = localRot.Value;
         proj.transform.SetParent(null);
         if (proj is Laser) {
-            proj.transform.localScale = new Vector3(ProjectileScale.x, 1.0f, 1.0f);
+            proj.transform.localScale = new Vector3(projScale.x * projScaleMultiplier, 1.0f, 1.0f);
             proj.transform.SetParent(this.transform);
             proj.transform.localPosition = new Vector3(0.0f, 0.0f, 0.01f); // centred, behind everything
-        } else proj.transform.localScale = new Vector3(ProjectileScale.x, ProjectileScale.y, 1.0f);
+        } else proj.transform.localScale = new Vector3(projScale.x * projScaleMultiplier, 
+            projScale.y * projScaleMultiplier, 1.0f);
         
-        proj.Init(ProjectileSpeed);
+        proj.Init(projSpeed * projSpeedMultiplier);
         proj.SetColor(OuterBodyColor);
 
         return proj;

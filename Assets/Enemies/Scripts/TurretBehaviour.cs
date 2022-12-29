@@ -10,8 +10,8 @@ public class TurretBehaviour : ShooterBehaviour {
     private PlayerController[] players;
     private Transform barrelComponent;
 
-    public TurretBehaviour Init(PlayerController[] players) {
-        this.players = players;
+    public TurretBehaviour Init() {
+        players = GlobalVariables.Players;
         return this;
     }
 
@@ -43,7 +43,7 @@ public class TurretBehaviour : ShooterBehaviour {
     }
     
     protected override Vector3 Move(Vector2 distance) {
-        
+
         
         // rotate barrel to face the player
         PlayerController target = TargetClosest();
