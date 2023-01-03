@@ -132,7 +132,7 @@ MonoBehaviour:
   OuterBodyParts:
   - {fileID: 100264899230893330}
   InnerBodyParts: []
-  moveSpeed: 2
+  moveSpeed: 1
   sineFrequency: 1
   sineAmplitude: 1
   bodyPartGap: 0

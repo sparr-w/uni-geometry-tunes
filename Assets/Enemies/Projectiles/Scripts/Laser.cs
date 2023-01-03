@@ -53,6 +53,10 @@ public class Laser : Projectile {
 
         yield return null;
     }
+    
+    /* refactor this, if needed, so that the "shot delay" is the cooldown between the laser "blasting"
+     * and the laser beginning to charge again, this way there won't be lasers repeatedly overlapping one another
+     */
 
     private IEnumerator Blast() {
         StopCoroutine(nameof(Shoot));

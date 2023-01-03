@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SpinShooterBehaviour : ShooterBehaviour {
+    [Header("Spinning Shooter Variables")]
     [SerializeField] private float rotationSpeedMultiplier = 1.0f;
     [SerializeField] private bool shootLeft, shootRight, shootUp, shootDown;
 
@@ -21,17 +22,7 @@ public class SpinShooterBehaviour : ShooterBehaviour {
         if (shootRight) transform.GetChild(3).gameObject.SetActive(true);
         else transform.GetChild(3).gameObject.SetActive(false);
     }
-
-    #region Initializers
-
-    public SpinShooterBehaviour InitProjectiles(float shotDelay = 0.2f, float projSpeed = 1.0f, float projSize = 1.0f) {
-        this.ShotDelay = shotDelay;
-        this.projSpeedMultiplier = projSpeed;
-        this.projScaleMultiplier = projSize;
-        
-        return this;
-    }
-
+    
     public SpinShooterBehaviour Init(bool[] shotDirections, float spinSpeed = 1.0f) {
         this.rotationSpeedMultiplier = spinSpeed;
         
@@ -53,9 +44,7 @@ public class SpinShooterBehaviour : ShooterBehaviour {
         
         return this;
     }
-
-    #endregion
-
+    
     private void Start() {
         ShowHideBarrels();
     }
@@ -73,17 +62,12 @@ public class SpinShooterBehaviour : ShooterBehaviour {
         }
     }
 
-    protected override Vector3 Move(Vector2 distance) {
-        // spin around
+    private void Spin() {
         this.transform.localEulerAngles += Vector3.forward * rotationSpeed * rotationSpeedMultiplier;
-
-        // move (if needs to move)
-        this.transform.position += new Vector3(distance.x, distance.y, 0.0f);
-        
-        return this.transform.position;
     }
 
-    private void Update() {
-        Move(new Vector2(0.0f, 0.0f) * moveSpeed * moveSpeedMultiplier * Time.deltaTime);
+    protected override void Update() {
+        base.Update();
+        Spin();
     }
 }

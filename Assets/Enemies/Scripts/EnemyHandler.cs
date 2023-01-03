@@ -160,12 +160,51 @@ public class EnemyHandler : MonoBehaviour {
     #region Global Enemy Variables
 
     private float enemySpeedMultiplier = 1.0f;
-    public float EnemySpeedMultiplier {
-        get { return enemySpeedMultiplier; } set { enemySpeedMultiplier = value; }
+    public string EnemySpeedMultiplier {
+        get { return "" + enemySpeedMultiplier; }
+        set {
+            if (Single.TryParse(value, out float i))
+                enemySpeedMultiplier = i;
+            else enemySpeedMultiplier = 1.0f;
+        }
     }
 
     #endregion
 
+    #region Global Projectile Variables
+
+    private float projShotDelay = 0.2f;
+    public string ProjShotDelay {
+        get { return "" + projShotDelay; }
+        set {
+            if (Single.TryParse(value, out float i))
+                projShotDelay = i;
+            else projShotDelay = 0.2f;
+        }
+    }
+    
+    private float projSpeed = 1.0f;
+    public string ProjSpeed {
+        get { return "" + projSpeed; }
+        set {
+            if (Single.TryParse(value, out float i))
+                projSpeed = i;
+            else projSpeed = 0.2f;
+        }
+    }
+    
+    private float projSize = 1.0f;
+    public string ProjSize {
+        get { return "" + projSize; }
+        set {
+            if (Single.TryParse(value, out float i))
+                projSize = i;
+            else projSize = 0.2f;
+        }
+    }
+
+    #endregion
+    
     #region Spinning Shooter Variables
 
     private bool[] spinnerDirections = { false, false, false, false }; // top, right, bottom, left -- like a clock
@@ -191,74 +230,106 @@ public class EnemyHandler : MonoBehaviour {
             else spinnerRotationMultiplier = 1.0f;
         }
     }
-    
-    private float spinnerShotDelay = 0.2f;
-    public string SpinnerShotDelay {
-        get { return "" + spinnerShotDelay; }
-        set {
-            if (Single.TryParse(value, out float i))
-                spinnerShotDelay = i;
-            else spinnerShotDelay = 0.2f;
-        }
-    }
-    
-    private float spinnerProjSpeed = 1.0f;
-    public string SpinnerProjSpeed {
-        get { return "" + spinnerProjSpeed; }
-        set {
-            if (Single.TryParse(value, out float i))
-                spinnerProjSpeed = i;
-            else spinnerProjSpeed = 0.2f;
-        }
-    }
-    
-    private float spinnerProjSize = 1.0f;
-    public string SpinnerProjSize {
-        get { return "" + spinnerProjSize; }
-        set {
-            if (Single.TryParse(value, out float i))
-                spinnerProjSize = i;
-            else spinnerProjSize = 0.2f;
-        }
-    }
-    
+
     #endregion
     
-    public Transform SpawnSpinningShooter(Vector2 spawnPos) { // gotta refactor spinning shooters so that it's easier to construct them
+    public Transform SpawnSpinningShooter(Vector2 spawnPos) {
         Transform newShooter = Instantiate(SpinShootPrefab);
         newShooter.transform.position = spawnPos;
 
         SpinShooterBehaviour behaviourComponent = newShooter.GetComponent<SpinShooterBehaviour>();
         behaviourComponent.SetColor(BodyColors);
         behaviourComponent.Init(spinnerDirections, spinnerRotationMultiplier);
-        behaviourComponent.InitProjectiles(spinnerShotDelay, spinnerProjSpeed, spinnerProjSize);
+        behaviourComponent.InitProjectiles(projShotDelay, projSpeed, projSize);
 
         return newShooter;
     }
     public void SpawnSpinShooter() { SpawnSpinningShooter(EnemySpawnPosition); }
 
+    #region Turret Variables
+
+    private float turretRotationSpeed = 0.0f;
+    public string TurretRotationSpeed {
+        get { return "" + turretRotationSpeed; }
+        set {
+            if (Single.TryParse(value, out float i))
+                turretRotationSpeed = i;
+            else turretRotationSpeed = 0.0f;
+        }
+    }
+
+    #endregion
+    
     public Transform SpawnTurret(Vector2 spawnPos) {
         Transform newShooter = Instantiate(TurretPrefab);
         newShooter.transform.position = spawnPos;
         
         TurretBehaviour behaviourComponent = newShooter.GetComponent<TurretBehaviour>();
         behaviourComponent.SetColor(BodyColors);
-        behaviourComponent.Init();
+        behaviourComponent.Init(enemySpeedMultiplier ,turretRotationSpeed);
+        behaviourComponent.InitProjectiles(projShotDelay, projSpeed, projSize);
 
         return newShooter;
     }
+    public void SpawnTurret() { SpawnTurret(EnemySpawnPosition); }
 
+    #region Worm Variables
+
+    private float wormSineFreq = 1.0f;
+    public string WormSineFrequency {
+        get { return "" + wormSineFreq; }
+        set {
+            if (Single.TryParse(value, out float i))
+                wormSineFreq = i;
+            else wormSineFreq = 1.0f;
+        }
+    }
+
+    private float wormSineAmp = 1.0f;
+    public string WormSineAmplitude {
+        get { return "" + wormSineAmp; }
+        set {
+            if (Single.TryParse(value, out float i))
+                wormSineAmp = i;
+            else wormSineAmp = 1.0f;
+        }
+    }
+
+    private float wormBodyGap = 0.0f;
+    public string WormBodyGap {
+        get { return "" + wormBodyGap; }
+        set {
+            if (Single.TryParse(value, out float i))
+                wormBodyGap = i;
+            else wormBodyGap = 0.0f;
+        }
+    }
+    
+    private int wormBodyParts = 9;
+    public string WormBodyParts {
+        get { return "" + wormBodyParts; }
+        set {
+            if (Int32.TryParse(value, out int i))
+                wormBodyParts = i;
+            else wormBodyParts = 9;
+        }
+    }
+
+    #endregion
+    
     public Transform SpawnWorm(Vector2 spawnPos) {
         Transform newWorm = Instantiate(WormPrefab);
         newWorm.transform.position = spawnPos;
         
         WormBehaviour behaviourComponent = newWorm.GetComponent<WormBehaviour>();
         behaviourComponent.SetColor(BodyColors);
-        behaviourComponent.Init();
+        behaviourComponent.Init(enemySpeedMultiplier, wormBodyGap, wormBodyParts);
+        behaviourComponent.InitPath(wormSineFreq, wormSineAmp);
 
         return newWorm;
     }
-
+    public void SpawnWorm() { SpawnWorm(EnemySpawnPosition); }
+    
     public Transform SpawnBoss(Vector2 spawnPos) {
         Transform newBoss = Instantiate(BossPrefab);
         newBoss.transform.position = spawnPos;

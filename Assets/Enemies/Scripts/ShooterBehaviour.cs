@@ -7,7 +7,7 @@ using UnityEngine;
 public class ShooterBehaviour : Enemy {
     public bool isFiring = true;
 
-    [Header("Shooting Behaviour")]
+    [Header("Shooter Projectile Variables")]
     [SerializeField] protected Projectile ProjectileType;
     [SerializeField] protected float projSpeedMultiplier = 1.0f;
     [SerializeField] protected float projScaleMultiplier = 1.0f;
@@ -26,6 +26,14 @@ public class ShooterBehaviour : Enemy {
         }
     }
 
+    public ShooterBehaviour InitProjectiles(float shotDelay = 0.2f, float projSpeed = 1.0f, float projSize = 1.0f) {
+        this.ShotDelay = shotDelay;
+        this.projSpeedMultiplier = projSpeed;
+        this.projScaleMultiplier = projSize;
+        
+        return this;
+    }
+    
     protected Projectile FireProjectile(Vector3? localPos = null, Vector3? localRot = null) {
         if (localPos == null) localPos = new Vector3(0.0f, 0.0f, 0.0f);
         if (localRot == null) localRot = new Vector3(0.0f, 0.0f, 0.0f);

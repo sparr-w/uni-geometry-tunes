@@ -5,16 +5,20 @@ using Unity.Mathematics;
 using UnityEngine;
 
 public class TurretBehaviour : ShooterBehaviour {
+    [Header("Turret Variables")]
     [SerializeField] private float rotationRate = 0.0f;
     
     private PlayerController[] players;
     private Transform barrelComponent;
 
-    public TurretBehaviour Init() {
+    public TurretBehaviour Init(float moveSpeedMult = 1.0f, float rotationSpeed = 0.0f) {
         players = GlobalVariables.Players;
+        this.rotationRate = rotationSpeed;
+        this.moveSpeedMultiplier = moveSpeedMult;
+        
         return this;
     }
-
+    
     private void Start() {
         StartCoroutine(Shoot());
         barrelComponent = this.transform.GetChild(0).transform.GetChild(0); // this should, if the structure of turrets isn't tampered with, find the barrel component
@@ -42,12 +46,10 @@ public class TurretBehaviour : ShooterBehaviour {
         }
     }
     
-    protected override Vector3 Move(Vector2 distance) {
-
-        
+    private void AimAtClosest() {
         // rotate barrel to face the player
         PlayerController target = TargetClosest();
-        
+
         Vector3 diff = new Vector3(target.transform.position.x, target.transform.position.y, 0.0f) -
                        new Vector3(this.transform.position.x, this.transform.position.y, 0.0f);
         diff.Normalize();
@@ -65,11 +67,10 @@ public class TurretBehaviour : ShooterBehaviour {
         } else currentRotation = targetRotation;
 
         this.transform.localEulerAngles = new Vector3(0.0f, 0.0f, currentRotation);
-
-        return this.transform.position;
     }
     
-    private void Update() {
-        Move(new Vector2(0.0f, 0.0f));
+    protected override void Update() {
+        AimAtClosest();
+        MovePatternChase(TargetClosest().transform.position);
     }
 }

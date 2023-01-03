@@ -15,7 +15,18 @@ public class WormBehaviour : Enemy {
     private Transform[] bodyParts;
     private float bodyPartRadius = 1.0f;
 
-    public WormBehaviour Init() {
+    public WormBehaviour Init(float moveSpeedMult = 1.0f, float bodyPartGap = 0.0f, int bodyPartCount = 9) {
+        this.moveSpeedMultiplier = moveSpeedMult;
+        this.bodyPartGap = bodyPartGap;
+        this.bodyPartCount = bodyPartCount;
+
+        return this;
+    }
+
+    public WormBehaviour InitPath(float sineFreq = 1.0f, float sineAmp = 1.0f) {
+        this.sineFrequency = sineFreq;
+        this.sineAmplitude = sineAmp;
+
         return this;
     }
     
@@ -41,7 +52,7 @@ public class WormBehaviour : Enemy {
     }
     */
 
-    protected override Vector3 Move(Vector2 distance) {
+    protected override Vector3 MovePatternDirection(Vector2 distance) {
         posX += distance.x;
         
         Vector2 horizontalMomentum = this.transform.right * posX;
@@ -90,7 +101,7 @@ public class WormBehaviour : Enemy {
         bodyPartRadius = bodyParts[0].localScale.x / 2;
     }
 
-    private void Update() {
-        Move(new Vector2(moveSpeed * Time.deltaTime, 0.0f));
+    protected override void Update() {
+        MovePatternDirection(new Vector2(moveSpeed * moveSpeedMultiplier * Time.deltaTime, 0.0f));
     }
 }
