@@ -68,9 +68,9 @@ public class TurretBehaviour : ShooterBehaviour {
 
         this.transform.localEulerAngles = new Vector3(0.0f, 0.0f, currentRotation);
     }
-    
+
     protected override void Update() {
+        base.Update();
         AimAtClosest();
-        MovePatternChase(TargetClosest().transform.position);
     }
 }

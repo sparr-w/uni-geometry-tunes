@@ -132,6 +132,8 @@ MonoBehaviour:
   OuterBodyParts:
   - {fileID: 100264899230893330}
   InnerBodyParts: []
+  movementPattern: 1
+  directionOfTravel: {x: 1, y: 0}
   moveSpeed: 1
   sineFrequency: 1
   sineAmplitude: 1

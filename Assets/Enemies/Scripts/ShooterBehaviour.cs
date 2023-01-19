@@ -5,6 +5,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 public class ShooterBehaviour : Enemy {
+    [Header("Shooter Variables")]
     public bool isFiring = true;
 
     [Header("Shooter Projectile Variables")]

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class WormBehaviour : Enemy {
-    [Header("Pathing Variables")]
+    [Header("Worm Pathing Variables")]
     [SerializeField] private float sineFrequency = 1.0f;
     [SerializeField] private float sineAmplitude = 1.0f;
-    [Header("Body Part Variables")]
+    [Header("Worm Appearance Variables")]
     [SerializeField] private float bodyPartGap = 0.0f;
     [SerializeField] private int bodyPartCount = 9;
 
@@ -14,6 +14,8 @@ public class WormBehaviour : Enemy {
     private Vector2 startPos;
     private Transform[] bodyParts;
     private float bodyPartRadius = 1.0f;
+
+    #region Initializers
 
     public WormBehaviour Init(float moveSpeedMult = 1.0f, float bodyPartGap = 0.0f, int bodyPartCount = 9) {
         this.moveSpeedMultiplier = moveSpeedMult;
@@ -29,7 +31,9 @@ public class WormBehaviour : Enemy {
 
         return this;
     }
-    
+
+    #endregion
+
     /* old method, only moves from left to right
     protected override Vector3 Move(Vector2 distance) {
         posX += distance.x;

@@ -19,6 +19,8 @@ public class TestPanel : MonoBehaviour {
     [Header("Components")]
     [SerializeField] private Image colourHandle;
     [SerializeField] private SpawnConfigComponents spawnConfigComponents;
+    [SerializeField] private GameObject[] enemyVariablesComponents;
+    private int enemyVarsEnabled = 0;
     
     private float defaultSpeed = 200.0f;
     private bool isActive = false, isMoving = false;
@@ -33,6 +35,9 @@ public class TestPanel : MonoBehaviour {
         rectTransform = this.GetComponent<RectTransform>();
 
         HandleHue(0.0f);
+
+        foreach (GameObject vars in enemyVariablesComponents) vars.SetActive(false);
+        enemyVariablesComponents[enemyVarsEnabled].SetActive(true);
     }
 
     private void Toggle(bool fromLeft = true) {
@@ -176,6 +181,13 @@ public class TestPanel : MonoBehaviour {
     public void UpdateUpperBounds() {
         spawnConfigComponents.RandomUpperX.text = _enemyHandler.SpawnUpperBoundsX;
         spawnConfigComponents.RandomUpperY.text = _enemyHandler.SpawnUpperBoundsY;
+    }
+
+    public void ShowEnemyVariables(int index) {
+        enemyVariablesComponents[enemyVarsEnabled].SetActive(false);
+        enemyVariablesComponents[index].SetActive(true);
+
+        enemyVarsEnabled = index;
     }
     
     private void Update() {

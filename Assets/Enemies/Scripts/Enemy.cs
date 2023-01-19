@@ -21,8 +21,10 @@ public class Enemy : MonoBehaviour {
 
     [Space(10)]
     protected float moveSpeedMultiplier = 1.0f;
+    [Header("Enemy Movement Variables")]
+    [SerializeField] protected EnemyMovementPatterns movementPattern = EnemyMovementPatterns.Static;
+    [SerializeField] protected Vector2 directionOfTravel = new Vector2(1.0f, 0.0f);
     [SerializeField] protected float moveSpeed = 0.0f;
-    protected EnemyMovementPatterns movementPattern = EnemyMovementPatterns.Static;
 
     public bool SetColor(Color[] newColors) {
         if (OuterBodyParts.Length < 1) return false;
@@ -74,7 +76,10 @@ public class Enemy : MonoBehaviour {
             case EnemyMovementPatterns.Static:
                 break;
             case EnemyMovementPatterns.Direction:
-                MovePatternDirection(new Vector2(Time.deltaTime * 5.0f, 0.0f));
+                float distance = directionOfTravel.magnitude;
+                Vector2 direction = directionOfTravel / distance;
+
+                MovePatternDirection(direction * moveSpeed * moveSpeedMultiplier * Time.deltaTime);
                 break;
             case EnemyMovementPatterns.ChasePlayer:
                 if (GlobalVariables.Players[0] != null)
