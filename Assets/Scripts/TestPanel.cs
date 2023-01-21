@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -12,14 +13,23 @@ public struct SpawnConfigComponents {
     public TMP_InputField ExactSpawnX, ExactSpawnY;
     public TMP_InputField RandomLowerX, RandomLowerY;
     public TMP_InputField RandomUpperX, RandomUpperY;
+
+    public GameObject SpawnVisualComponent, RandomSpawnVisual, ExactSpawnVisual;
+}
+
+[System.Serializable]
+public struct ShooterProjectileFields {
+    public TMP_InputField ShotDelay, SpeedMultiplier, SizeMultiplier;
 }
 
 public class TestPanel : MonoBehaviour {
     [SerializeField] private EnemyHandler _enemyHandler;
     [Header("Components")]
     [SerializeField] private Image colourHandle;
+    [SerializeField] private TMP_InputField speedMultiplierField;
     [SerializeField] private SpawnConfigComponents spawnConfigComponents;
     [SerializeField] private GameObject[] enemyVariablesComponents;
+    [SerializeField] private ShooterProjectileFields shooterProjectileFields;
     private int enemyVarsEnabled = 0;
     
     private float defaultSpeed = 200.0f;
@@ -168,6 +178,8 @@ public class TestPanel : MonoBehaviour {
         }
     }
 
+    #region Update UI after Data Validation
+    
     public void UpdateExactSpawn() {
         spawnConfigComponents.ExactSpawnX.text = _enemyHandler.SpawnLocationX;
         spawnConfigComponents.ExactSpawnY.text = _enemyHandler.SpawnLocationY;
@@ -183,6 +195,76 @@ public class TestPanel : MonoBehaviour {
         spawnConfigComponents.RandomUpperY.text = _enemyHandler.SpawnUpperBoundsY;
     }
 
+    public void UpdateEnemySpeedMultiplier() {
+        speedMultiplierField.text = _enemyHandler.EnemySpeedMultiplier;
+    }
+
+    public void UpdateProjectileShotDelay() {
+        shooterProjectileFields.ShotDelay.text = _enemyHandler.ProjShotDelay;
+    }
+
+    public void UpdateProjectileSpeedMultiplier() {
+        shooterProjectileFields.SpeedMultiplier.text = _enemyHandler.ProjSpeed;
+    }
+
+    public void UpdateProjectileSizeMultiplier() {
+        shooterProjectileFields.SizeMultiplier.text = _enemyHandler.ProjSize;
+    }
+    
+    #endregion
+    
+    public void ShowCorrectSpawnVisual() {
+        if (spawnConfigComponents.RandomSpawnComponent.activeSelf) {
+            spawnConfigComponents.RandomSpawnVisual.SetActive(true);
+            spawnConfigComponents.ExactSpawnVisual.SetActive(false);
+        }
+        else {
+            spawnConfigComponents.RandomSpawnVisual.SetActive(false);
+            spawnConfigComponents.ExactSpawnVisual.SetActive(true);
+        }
+    }
+    
+    public void ToggleEnemySpawnVisual(bool newState) {
+        spawnConfigComponents.SpawnVisualComponent.SetActive(newState);
+        if (newState == false) return;
+
+        ShowCorrectSpawnVisual();
+    }
+
+    public void UpdateRandomSpawnVisual() {
+        // need to access numerous variables, no point in taking in any
+        float width = _enemyHandler.RandomSpawnUpperBounds.x - _enemyHandler.RandomSpawnLowerBounds.x; // diffference
+        width = (width / (GlobalVariables.ScreenBounds.x * 2)) * 1920.0f; // fractional multi by ref scale
+
+        float height = _enemyHandler.RandomSpawnUpperBounds.y - _enemyHandler.RandomSpawnLowerBounds.y;
+        height = (height / (GlobalVariables.ScreenBounds.y * 2)) * 1080.0f;
+
+        float posX = _enemyHandler.RandomSpawnUpperBounds.x - _enemyHandler.RandomSpawnLowerBounds.x; // difference
+        posX = ((posX / 2) + _enemyHandler.RandomSpawnLowerBounds.x) / (GlobalVariables.ScreenBounds.x * 2); // fractional
+        posX = posX * 1920.0f; // by reference scale
+
+        float posY = _enemyHandler.RandomSpawnUpperBounds.y - _enemyHandler.RandomSpawnLowerBounds.y;
+        posY = ((posY / 2) + _enemyHandler.RandomSpawnLowerBounds.y) / (GlobalVariables.ScreenBounds.y * 2);
+        posY = posY * 1080.0f;
+
+        RectTransform visualTransform = spawnConfigComponents.RandomSpawnVisual.GetComponent<RectTransform>();
+        visualTransform.localPosition = new Vector3(posX, posY, visualTransform.localPosition.z);
+        visualTransform.sizeDelta = new Vector2(width, height);
+    }
+
+    public void UpdateExactSpawnVisual() {
+        float posX = GlobalVariables.ScreenBounds.x - _enemyHandler.ExactSpawnLocation.x;
+        posX = (posX / (GlobalVariables.ScreenBounds.x * 2)) * 1920.0f;
+        posX = -(posX - 960.0f); // offset and reverse
+        
+        float posY = GlobalVariables.ScreenBounds.y - _enemyHandler.ExactSpawnLocation.y;
+        posY = (posY / (GlobalVariables.ScreenBounds.y * 2)) * 1080.0f;
+        posY = -(posY - 540.0f);
+
+        RectTransform visualTransform = spawnConfigComponents.ExactSpawnVisual.GetComponent<RectTransform>();
+        visualTransform.localPosition = new Vector3(posX, posY, visualTransform.localPosition.z);
+    }
+    
     public void ShowEnemyVariables(int index) {
         enemyVariablesComponents[enemyVarsEnabled].SetActive(false);
         enemyVariablesComponents[index].SetActive(true);

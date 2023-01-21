@@ -4,14 +4,29 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
+    [Header("Immunity Config")]
+    [SerializeField] private GameObject immunityBubbleComponent;
+    [SerializeField] private SpriteRenderer bubbleRenderer;
+    [SerializeField] private float immunityDuration = 1.0f;
+    [Header("Components")]
+    [SerializeField] private GameObject maskChunksComponent;
+    private Transform[] maskChunks;
+    
     private float moveSpeed = 5.0f, rotSpeed = 400.0f;
     private float horizontalInput = 0.0f, verticalInput = 0.0f;
-    private int hitPoints = 10;
-    private bool damageImmune = true;
+    private int maxHitPoints = 10, hitPoints;
+    private bool damageImmune = false;
+    private float immunityElapsed = 0.0f;
     private Transform bodyComponent;
 
     private void Start() {
+        hitPoints = maxHitPoints;
+        
         bodyComponent = transform.Find("Body");
+
+        maskChunks = new Transform[maskChunksComponent.transform.childCount];
+        for (int i = 0; i < maskChunks.Length; i++) // should add TR, BR, BL, TL
+            maskChunks[i] = maskChunksComponent.transform.GetChild(i).GetChild(0);
     }
 
     private void GetInput() {
@@ -89,8 +104,15 @@ public class PlayerController : MonoBehaviour {
         return transform.position;
     }
 
+    private void SetImmunityState(bool newState) {
+        immunityBubbleComponent.SetActive(newState);
+        damageImmune = newState;
+    }
+    
     public bool DealDamage(int damage) {
         if (damageImmune) return false; // can't deal damage to player, return that the hit wasn't received
+
+        float c = hitPoints;
         
         if (damage >= hitPoints) {
             hitPoints = 0;
@@ -98,11 +120,34 @@ public class PlayerController : MonoBehaviour {
         }
         else {
             hitPoints -= damage;
+            SetImmunityState(true);
         }
-
+        
+        UpdateChunks();
+        
+        Debug.Log("Player taken (" + damage + ") damage, previous health = " + c + ", remaining health = " + hitPoints);
         return true;
     }
 
+    private void UpdateChunks() {
+        for (int i = 0; i < maskChunks.Length; i++) {
+            float minChunk = 1.0f - (0.25f * (i + 1)); // min hp for this chunk
+            float percentageHP = (float)hitPoints / maxHitPoints;
+
+            float posY = percentageHP - minChunk;
+            posY = Mathf.Clamp(posY, 0.0f, 0.25f);
+            posY = (posY * 4) - 1.0f; 
+
+            if (posY <= -1.0f) {
+                maskChunks[i].gameObject.SetActive(false);
+            }
+            else {
+                maskChunks[i].gameObject.SetActive(true);
+                maskChunks[i].localPosition = new Vector3(0.0f, posY, 0.0f);
+            }
+        }
+    }
+    
     private void Die() {
         // do some sort of simple death animation, explode? spin and shrink out of existence?
         damageImmune = true; // don't need to take more damage, prevent multiple calls of function
@@ -113,5 +158,14 @@ public class PlayerController : MonoBehaviour {
         
         Move(new Vector2(horizontalInput * moveSpeed * Time.deltaTime, 
             verticalInput * moveSpeed * Time.deltaTime));
+
+        if (damageImmune) {
+            immunityElapsed += Time.deltaTime;
+            
+            if (immunityElapsed >= immunityDuration) {
+                immunityElapsed = 0.0f;
+                SetImmunityState(false);
+            }
+        }
     }
 }

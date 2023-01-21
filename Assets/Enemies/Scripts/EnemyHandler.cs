@@ -13,6 +13,12 @@ public class EnemyHandler : MonoBehaviour {
         get { return spawnRandom; } set { spawnRandom = value; }
     }
     private Vector2 spawnLowerBounds, spawnUpperBounds;
+    public Vector2 RandomSpawnLowerBounds {
+        get { return spawnLowerBounds; }
+    }
+    public Vector2 RandomSpawnUpperBounds {
+        get { return spawnUpperBounds; }
+    }
     public string SpawnLowerBoundsX {
         get { return spawnLowerBounds.x + ""; }
         set {
@@ -82,6 +88,9 @@ public class EnemyHandler : MonoBehaviour {
         }
     }
     private Vector2 spawnLocation = new Vector2(0.0f, 0.0f);
+    public Vector2 ExactSpawnLocation {
+        get { return spawnLocation; }
+    }
     public string SpawnLocationX {
         get { return spawnLocation.x + ""; }
         set {
@@ -163,8 +172,11 @@ public class EnemyHandler : MonoBehaviour {
     public string EnemySpeedMultiplier {
         get { return "" + enemySpeedMultiplier; }
         set {
-            if (Single.TryParse(value, out float i))
-                enemySpeedMultiplier = i;
+            if (Single.TryParse(value, out float i)) {
+                if (i < 0.0f) // don't accept negative values
+                    enemySpeedMultiplier = 1.0f;
+                else enemySpeedMultiplier = i;
+            }
             else enemySpeedMultiplier = 1.0f;
         }
     }
@@ -177,8 +189,11 @@ public class EnemyHandler : MonoBehaviour {
     public string ProjShotDelay {
         get { return "" + projShotDelay; }
         set {
-            if (Single.TryParse(value, out float i))
-                projShotDelay = i;
+            if (Single.TryParse(value, out float i)) {
+                if (i < 0.0f) // can't enter negative value
+                    projShotDelay = 0.2f;
+                else projShotDelay = i;
+            }
             else projShotDelay = 0.2f;
         }
     }
@@ -187,8 +202,11 @@ public class EnemyHandler : MonoBehaviour {
     public string ProjSpeed {
         get { return "" + projSpeed; }
         set {
-            if (Single.TryParse(value, out float i))
-                projSpeed = i;
+            if (Single.TryParse(value, out float i)) {
+                if (i < 0.0f) // no negative
+                    projSpeed = 1.0f;
+                else projSpeed = i;
+            }
             else projSpeed = 0.2f;
         }
     }
@@ -197,9 +215,12 @@ public class EnemyHandler : MonoBehaviour {
     public string ProjSize {
         get { return "" + projSize; }
         set {
-            if (Single.TryParse(value, out float i))
-                projSize = i;
-            else projSize = 0.2f;
+            if (Single.TryParse(value, out float i)) {
+                if (i < 0.0f)
+                    projSize = 1.0f;
+                else projSize = i;
+            }
+            else projSize = 1.0f;
         }
     }
 
