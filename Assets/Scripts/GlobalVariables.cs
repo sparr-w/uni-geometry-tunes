@@ -35,3 +35,21 @@ public class GlobalVariables : MonoBehaviour {
         }
     }
 }
+
+public struct DamageReport {
+    private int amountInflicted;
+    private Vector2? pointOfCollision; // this is the position of what sent the damage, for example, the projectile's position during the collision
+    
+    public DamageReport(int damage) {
+        this.amountInflicted = damage;
+        this.pointOfCollision = null;
+    }
+
+    public DamageReport(int damage, Vector2? inflictedAt) {
+        this.amountInflicted = damage;
+        this.pointOfCollision = inflictedAt;
+    }
+
+    public int AmountInflicted { get { return amountInflicted; } }
+    public Vector2? PointOfCollision { get { return pointOfCollision; } }
+}

@@ -4,7 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+public enum Shapes {
+    Circle,
+    Triangle,
+    Square
+}
+
+[System.Serializable]
+public struct ProjectileShape {
+    public Shapes Shape;
+    public Sprite Sprite;
+}
+
 public class EnemyHandler : MonoBehaviour {
+    [SerializeField] private ProjectileShape[] projectileShapes;
+
     [Header("Enemy Prefabs")] [SerializeField] private Transform WormPrefab;
     [SerializeField] private Transform SpinShootPrefab, TurretPrefab, BossPrefab;
 
@@ -261,6 +275,9 @@ public class EnemyHandler : MonoBehaviour {
         SpinShooterBehaviour behaviourComponent = newShooter.GetComponent<SpinShooterBehaviour>();
         behaviourComponent.SetColor(BodyColors);
         behaviourComponent.Init(spinnerDirections, spinnerRotationMultiplier);
+        
+        behaviourComponent.SetAttackType(AttackType.Projectile);
+        behaviourComponent.SetProjectileSprite(projectileShapes[2].Sprite);
         behaviourComponent.InitProjectiles(projShotDelay, projSpeed, projSize);
 
         return newShooter;

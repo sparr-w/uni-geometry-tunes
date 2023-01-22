@@ -93,10 +93,12 @@ public class Enemy : MonoBehaviour {
         Move();
     }
     
-    private void OnTriggerEnter2D(Collider2D other) { // most enemies will have a trigger collider, so when the player crashes into them, he should take damage
+    protected virtual void OnTriggerEnter2D(Collider2D other) { // most enemies will have a trigger collider, so when the player crashes into them, he should take damage
         if (other.CompareTag("Player")) {
             PlayerController playerController = other.gameObject.GetComponent<PlayerController>();
-            playerController.DealDamage(1);
+
+            DamageReport damageReport = new DamageReport(1, this.transform.position);
+            playerController.DealDamage(damageReport);
         }
     }
 }

@@ -411,9 +411,13 @@ MonoBehaviour:
   - {fileID: 8385814666119174891}
   InnerBodyParts:
   - {fileID: 4752343484629607288}
-  moveSpeedMultiplier: 1
+  movementPattern: 0
+  directionOfTravel: {x: 1, y: 0}
+  moveSpeed: 0
   isFiring: 1
-  ProjectileType: {fileID: 6948237199857144739, guid: 37a024caf20e79d449fe56873b326018, type: 3}
+  projectilePrefab: {fileID: 4615904167542275884, guid: ba4868d984963eb47ac8ce17f130bcf5, type: 3}
+  laserPrefab: {fileID: 4178473161919393092, guid: 47926439435675c42a7e2dfc528981b5, type: 3}
+  attackType: 0
   projSpeedMultiplier: 1
   projScaleMultiplier: 1
   ShotDelay: 0.2

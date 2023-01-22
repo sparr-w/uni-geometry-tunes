@@ -8,9 +8,6 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private GameObject immunityBubbleComponent;
     [SerializeField] private SpriteRenderer bubbleRenderer;
     [SerializeField] private float immunityDuration = 1.0f;
-    [Header("Components")]
-    [SerializeField] private GameObject maskChunksComponent;
-    private Transform[] maskChunks;
     
     private float moveSpeed = 5.0f, rotSpeed = 400.0f;
     private float horizontalInput = 0.0f, verticalInput = 0.0f;
@@ -24,9 +21,9 @@ public class PlayerController : MonoBehaviour {
         
         bodyComponent = transform.Find("Body");
 
-        maskChunks = new Transform[maskChunksComponent.transform.childCount];
-        for (int i = 0; i < maskChunks.Length; i++) // should add TR, BR, BL, TL
-            maskChunks[i] = maskChunksComponent.transform.GetChild(i).GetChild(0);
+//        maskChunks = new Transform[maskChunksComponent.transform.childCount];
+//        for (int i = 0; i < maskChunks.Length; i++) // should add TR, BR, BL, TL
+//            maskChunks[i] = maskChunksComponent.transform.GetChild(i).GetChild(0);
     }
 
     private void GetInput() {
@@ -109,44 +106,42 @@ public class PlayerController : MonoBehaviour {
         damageImmune = newState;
     }
     
-    public bool DealDamage(int damage) {
+    public bool DealDamage(DamageReport report) {
         if (damageImmune) return false; // can't deal damage to player, return that the hit wasn't received
 
         float c = hitPoints;
         
-        if (damage >= hitPoints) {
+        if (report.AmountInflicted >= hitPoints) {
             hitPoints = 0;
             Die();
         }
         else {
-            hitPoints -= damage;
+            hitPoints -= report.AmountInflicted;
             SetImmunityState(true);
         }
         
-        UpdateChunks();
-        
-        Debug.Log("Player taken (" + damage + ") damage, previous health = " + c + ", remaining health = " + hitPoints);
+        Debug.Log("Player taken (" + report.AmountInflicted + ") damage, previous health = " + c + ", remaining health = " + hitPoints);
         return true;
     }
-
-    private void UpdateChunks() {
-        for (int i = 0; i < maskChunks.Length; i++) {
-            float minChunk = 1.0f - (0.25f * (i + 1)); // min hp for this chunk
-            float percentageHP = (float)hitPoints / maxHitPoints;
-
-            float posY = percentageHP - minChunk;
-            posY = Mathf.Clamp(posY, 0.0f, 0.25f);
-            posY = (posY * 4) - 1.0f; 
-
-            if (posY <= -1.0f) {
-                maskChunks[i].gameObject.SetActive(false);
-            }
-            else {
-                maskChunks[i].gameObject.SetActive(true);
-                maskChunks[i].localPosition = new Vector3(0.0f, posY, 0.0f);
-            }
-        }
-    }
+    
+//    private void UpdateChunks() {
+//        for (int i = 0; i < maskChunks.Length; i++) {
+//            float minChunk = 1.0f - (0.25f * (i + 1)); // min hp for this chunk
+//            float percentageHP = (float)hitPoints / maxHitPoints;
+//
+//            float posY = percentageHP - minChunk;
+//            posY = Mathf.Clamp(posY, 0.0f, 0.25f);
+//            posY = (posY * 4) - 1.0f; 
+//
+//            if (posY <= -1.0f) {
+//                maskChunks[i].gameObject.SetActive(false);
+//            }
+//            else {
+//                maskChunks[i].gameObject.SetActive(true);
+//                maskChunks[i].localPosition = new Vector3(0.0f, posY, 0.0f);
+//            }
+//        }
+//    }
     
     private void Die() {
         // do some sort of simple death animation, explode? spin and shrink out of existence?

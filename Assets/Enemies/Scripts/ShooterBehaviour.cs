@@ -4,18 +4,29 @@ using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 
+public enum AttackType {
+    Projectile,
+    Laser
+}
+
 public class ShooterBehaviour : Enemy {
     [Header("Shooter Variables")]
     public bool isFiring = true;
 
+    [Header("Shooter Attack Prefabs")] 
+    [SerializeField] protected Projectile projectilePrefab;
+    [SerializeField] protected Projectile laserPrefab;
+    
     [Header("Shooter Projectile Variables")]
-    [SerializeField] protected Projectile ProjectileType;
+    [SerializeField] protected AttackType attackType;
     [SerializeField] protected float projSpeedMultiplier = 1.0f;
     [SerializeField] protected float projScaleMultiplier = 1.0f;
     [SerializeField] protected float ShotDelay = 0.2f;
     
-    protected float projSpeed = 3.5f;
+    protected readonly float projSpeed = 3.5f;
     protected Vector2 projScale = new Vector2(.3f, .3f);
+
+    private Sprite projSprite;
 
     protected virtual IEnumerator Shoot() {
         yield return 0;
@@ -31,26 +42,49 @@ public class ShooterBehaviour : Enemy {
         this.ShotDelay = shotDelay;
         this.projSpeedMultiplier = projSpeed;
         this.projScaleMultiplier = projSize;
-        
+        return this;
+    }
+
+    public ShooterBehaviour SetAttackType(AttackType newType) {
+        this.attackType = newType;
+        return this;
+    }
+
+    public ShooterBehaviour SetProjectileSprite(Sprite newSprite) {
+        this.projSprite = newSprite;
         return this;
     }
     
     protected Projectile FireProjectile(Vector3? localPos = null, Vector3? localRot = null) {
-        if (localPos == null) localPos = new Vector3(0.0f, 0.0f, 0.0f);
-        if (localRot == null) localRot = new Vector3(0.0f, 0.0f, 0.0f);
+        localPos ??= new Vector3(0.0f, 0.0f, 0.0f);
+        localRot ??= new Vector3(0.0f, 0.0f, 0.0f);
 
-        Projectile proj = Instantiate(ProjectileType, this.transform);
-        
-        proj.transform.localPosition = localPos.Value;
-        proj.transform.localEulerAngles = localRot.Value;
-        proj.transform.SetParent(null);
-        if (proj is Laser) {
-            proj.transform.localScale = new Vector3(projScale.x * projScaleMultiplier, 1.0f, 1.0f);
-            proj.transform.SetParent(this.transform);
-            proj.transform.localPosition = new Vector3(0.0f, 0.0f, 0.01f); // centred, behind everything
-        } else proj.transform.localScale = new Vector3(projScale.x * projScaleMultiplier, 
-            projScale.y * projScaleMultiplier, 1.0f);
-        
+        Projectile proj;
+        switch (attackType) {
+            case AttackType.Laser:
+                proj = Instantiate(laserPrefab, this.transform);
+                break;
+            default:
+                proj = Instantiate(projectilePrefab, this.transform);
+                break;
+        }
+
+        Transform pTrans = proj.transform;
+        pTrans.localEulerAngles = localRot.Value;
+        switch (attackType) {
+            case AttackType.Laser:
+                pTrans.localScale = new Vector3(projScale.x * projScaleMultiplier, 1.0f, 1.0f);
+                pTrans.localPosition = new Vector3(0.0f, 0.0f, 0.01f); // centred, behind body
+                break;
+            default:
+                pTrans.localScale = new Vector3(projScale.x * projScaleMultiplier,
+                    projScale.y * projScaleMultiplier, 1.0f);
+                pTrans.localPosition = localPos.Value;
+                pTrans.SetParent(null);
+                proj.SetSprite(projSprite);
+                break;
+        }
+
         proj.Init(projSpeed * projSpeedMultiplier);
         proj.SetColor(OuterBodyColor);
 
