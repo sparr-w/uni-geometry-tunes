@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class GlobalVariables : MonoBehaviour {
@@ -33,6 +34,17 @@ public class GlobalVariables : MonoBehaviour {
 
             return bounds;
         }
+    }
+
+    public static bool OutOfBoundsCheck(Transform objectTransform) {
+        Vector2 oPos = new Vector2(Mathf.Abs(objectTransform.position.x), Mathf.Abs(objectTransform.position.y));
+        Vector2 oScale = objectTransform.lossyScale;
+        oScale += oScale * 0.1f; // 10% object scale compensation just in case it seems jarring
+
+        Vector2 bounds = ScreenBounds;
+        if ((oPos - oScale).x > bounds.x || (oPos - oScale).y > bounds.y)
+            return true;
+        else return false;
     }
 }
 

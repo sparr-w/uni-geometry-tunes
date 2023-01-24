@@ -19,7 +19,9 @@ public class TurretBehaviour : ShooterBehaviour {
         return this;
     }
     
-    private void Start() {
+    protected override void Start() {
+        base.Start();
+        
         StartCoroutine(Shoot());
         barrelComponent = this.transform.GetChild(0).transform.GetChild(0); // this should, if the structure of turrets isn't tampered with, find the barrel component
     }

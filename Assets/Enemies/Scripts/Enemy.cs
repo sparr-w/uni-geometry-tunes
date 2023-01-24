@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
@@ -87,6 +88,10 @@ public class Enemy : MonoBehaviour {
                 else Debug.LogWarning("There are no players to target!");
                 break;
         }
+    }
+
+    protected virtual void Start() {
+        throw new NotImplementedException();
     }
 
     protected virtual void Update() {

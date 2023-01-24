@@ -10,6 +10,13 @@ public class Projectile : MonoBehaviour {
 
     private SpriteRenderer spriteRenderer;
 
+    private ProjectilePool associatedPool; private bool pooledObject = false;
+
+    public void SetAssociatedPool(ProjectilePool pool) {
+        associatedPool = pool;
+        pooledObject = true;
+    }
+
     private void GetSpriteRenderer() { spriteRenderer = transform.GetChild(0).GetComponent<SpriteRenderer>(); }
     
     public void SetColor(Color newColor) {
@@ -35,6 +42,11 @@ public class Projectile : MonoBehaviour {
 
     private void Update() {
         Move(Speed * Time.deltaTime);
+
+        if (GlobalVariables.OutOfBoundsCheck(this.transform)) {
+            if (pooledObject) associatedPool.ReturnUsedProjectile(this);
+            else Destroy(this.gameObject);
+        }
     }
 
     protected void OnTriggerEnter2D(Collider2D other) {

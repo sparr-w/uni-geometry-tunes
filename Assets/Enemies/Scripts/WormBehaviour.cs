@@ -81,7 +81,7 @@ public class WormBehaviour : Enemy {
         return this.transform.position;
     }
 
-    private void Start() {
+    protected override void Start() {
         startPos = this.transform.position;
         
         OuterBodyParts = new SpriteRenderer[bodyPartCount];
