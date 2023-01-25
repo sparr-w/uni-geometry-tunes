@@ -11,7 +11,8 @@ public enum AttackType {
 
 public enum ProjectileHandlers {
     Standard,
-    Pooling
+    Pooling,
+    Entities
 }
 
 public class ShooterBehaviour : Enemy {
@@ -34,6 +35,7 @@ public class ShooterBehaviour : Enemy {
 
     private Sprite projSprite;
     private ProjectilePool projectilePool;
+    private ECSBulletSpawn entityHandler;
 
     protected virtual IEnumerator Shoot() {
         yield return 0;
@@ -56,7 +58,16 @@ public class ShooterBehaviour : Enemy {
         this.attackType = newType;
         return this;
     }
-
+    public ShooterBehaviour SetProjectileHandler(ProjectileHandlers handler) {
+        this.projectileHandler = handler;
+        return this;
+    }
+    public ShooterBehaviour InitShooterProfile(AttackType attackType, ProjectileHandlers handler) {
+        SetAttackType(attackType);
+        SetProjectileHandler(handler);
+        return this;
+    }
+    
     public ShooterBehaviour SetProjectileSprite(Sprite newSprite) {
         this.projSprite = newSprite;
         return this;
@@ -64,32 +75,26 @@ public class ShooterBehaviour : Enemy {
 
     protected override void Start() {
         projectilePool = FindObjectOfType<ProjectilePool>();
+        entityHandler = FindObjectOfType<ECSBulletSpawn>();
     }
 
     protected Projectile FireProjectile(Vector3? localPos = null, Vector3? localRot = null) {
+        // if the values aren't set (are null), give them default values -- this method is used because you cannot null regular vectors
         localPos ??= new Vector3(0.0f, 0.0f, 0.0f);
         localRot ??= new Vector3(0.0f, 0.0f, 0.0f);
 
         Projectile proj;
-        Transform pTrans;
-        
+        // get/make new projectile
         switch (projectileHandler) {
             case ProjectileHandlers.Pooling:
                 proj = projectilePool.GetUnusedProjectile();
-                pTrans = proj.transform;
-                pTrans.SetParent(this.transform);
-                pTrans.localEulerAngles = localRot.Value;
-                pTrans.localScale = new Vector3(projScale.x * projScaleMultiplier,
-                    projScale.y * projScaleMultiplier, 1.0f);
-                pTrans.localPosition = localPos.Value;
-                pTrans.SetParent(projectilePool.transform);
-                proj.SetSprite(projSprite);
-                proj.Init(projSpeed * projSpeedMultiplier);
-                proj.SetColor(OuterBodyColor);
-                proj.gameObject.SetActive(true);
-                
+                proj.transform.SetParent(this.transform);
                 break;
-            default: // standard, default, same thing
+            case ProjectileHandlers.Entities:
+                entityHandler.Spawn(this.transform.position, Vector2.up);
+                return null;
+                break;
+            default:
                 switch (attackType) {
                     case AttackType.Laser:
                         proj = Instantiate(laserPrefab, this.transform);
@@ -98,29 +103,37 @@ public class ShooterBehaviour : Enemy {
                         proj = Instantiate(projectilePrefab, this.transform);
                         break;
                 }
-
-                pTrans = proj.transform;
-                pTrans.localEulerAngles = localRot.Value;
-                switch (attackType) {
-                    case AttackType.Laser:
-                        pTrans.localScale = new Vector3(projScale.x * projScaleMultiplier, 1.0f, 1.0f);
-                        pTrans.localPosition = new Vector3(0.0f, 0.0f, 0.01f); // centred, behind body
-                        break;
-                    default:
-                        pTrans.localScale = new Vector3(projScale.x * projScaleMultiplier,
-                            projScale.y * projScaleMultiplier, 1.0f);
-                        pTrans.localPosition = localPos.Value;
-                        pTrans.SetParent(null);
-                        proj.SetSprite(projSprite);
-                        break;
-                }
-
-                proj.Init(projSpeed * projSpeedMultiplier);
-                proj.SetColor(OuterBodyColor);
-
                 break;
         }
-
+        
+        Transform pTrans = proj.transform;
+        // apply transforms
+        pTrans.localEulerAngles = localRot.Value;
+        if (attackType == AttackType.Projectile || projectileHandler == ProjectileHandlers.Pooling) {
+            pTrans.localScale = new Vector3(projScale.x * projScaleMultiplier, 
+                projScale.y * projScaleMultiplier, 1.0f);
+            pTrans.localPosition = localPos.Value;
+            proj.SetSprite(projSprite);
+            
+            // return object to the pool
+            if (projectileHandler == ProjectileHandlers.Pooling)
+                pTrans.SetParent(projectilePool.transform);
+            else 
+                pTrans.SetParent(null);
+        } 
+        else if (attackType == AttackType.Laser) {
+            pTrans.localScale = new Vector3(projScale.x * projScaleMultiplier, 1.0f, 1.0f);
+            pTrans.localPosition = new Vector3(0.0f, 0.0f, 0.01f); // centred, behind body
+        }
+        
+        // initialise projectile
+        proj.Init(projSpeed * projSpeedMultiplier);
+        proj.SetColor(OuterBodyColor);
+        
+        // if pooling, set object to being used by making it active
+        if (projectileHandler == ProjectileHandlers.Pooling)
+            proj.gameObject.SetActive(true);
+        
         return proj;
     }
 }

@@ -136,9 +136,10 @@ public class EnemyHandler : MonoBehaviour {
         }
     }
     
-    private float colourSaturation = 0.7f;
-    private float colourBrightnessInner = 0.4f, colourBrightnessOuter = 0.7f;
-    
+    private readonly float colourSaturation = 0.7f;
+    private readonly float colourBrightnessInner = 0.4f;
+    private readonly float colourBrightnessOuter = 0.7f;
+
     private bool colourOverride = false;
     public bool ColourOverride {
         get { return colourOverride; } set { colourOverride = value; }
@@ -238,6 +239,23 @@ public class EnemyHandler : MonoBehaviour {
         }
     }
 
+    private AttackType shooterAttackType = AttackType.Projectile;
+    public Int32 DropdownAttackType {
+        set {
+            if (value == 0) shooterAttackType = AttackType.Projectile;
+            else if (value == 1) shooterAttackType = AttackType.Laser;
+        }
+    }
+
+    private ProjectileHandlers projectileHandler = ProjectileHandlers.Standard;
+    public Int32 DropdownProjectileHandler {
+        set {
+            if (value == 0) projectileHandler = ProjectileHandlers.Standard;
+            else if (value == 1) projectileHandler = ProjectileHandlers.Pooling;
+            else if (value == 2) projectileHandler = ProjectileHandlers.Entities;
+        }
+    }
+    
     #endregion
     
     #region Spinning Shooter Variables
@@ -276,9 +294,9 @@ public class EnemyHandler : MonoBehaviour {
         behaviourComponent.SetColor(BodyColors);
         behaviourComponent.Init(spinnerDirections, spinnerRotationMultiplier);
         
-        behaviourComponent.SetAttackType(AttackType.Projectile);
         behaviourComponent.SetProjectileSprite(projectileShapes[2].Sprite);
         behaviourComponent.InitProjectiles(projShotDelay, projSpeed, projSize);
+        behaviourComponent.InitShooterProfile(shooterAttackType, projectileHandler);
 
         return newShooter;
     }
@@ -305,7 +323,10 @@ public class EnemyHandler : MonoBehaviour {
         TurretBehaviour behaviourComponent = newShooter.GetComponent<TurretBehaviour>();
         behaviourComponent.SetColor(BodyColors);
         behaviourComponent.Init(enemySpeedMultiplier ,turretRotationSpeed);
+
+        behaviourComponent.SetProjectileSprite(projectileShapes[2].Sprite);
         behaviourComponent.InitProjectiles(projShotDelay, projSpeed, projSize);
+        behaviourComponent.InitShooterProfile(shooterAttackType, projectileHandler);
 
         return newShooter;
     }

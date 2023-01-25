@@ -11,7 +11,6 @@ public class Projectile : MonoBehaviour {
     private SpriteRenderer spriteRenderer;
 
     private ProjectilePool associatedPool; private bool pooledObject = false;
-
     public void SetAssociatedPool(ProjectilePool pool) {
         associatedPool = pool;
         pooledObject = true;

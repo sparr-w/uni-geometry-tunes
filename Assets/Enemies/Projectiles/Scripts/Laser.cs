@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Laser : Projectile {
     [SerializeField] private float finalOpacity = 0.5f;
@@ -8,6 +9,7 @@ public class Laser : Projectile {
 
     private Transform beamComponent;
     private SpriteRenderer beamRendererComponent;
+    private BoxCollider2D coll2D;
     
     private float chargeProgress = 0.0f;
     private const float beamHideTimeframe = 0.15f;
@@ -20,9 +22,10 @@ public class Laser : Projectile {
             beamRendererComponent.color.g,
             beamRendererComponent.color.b,
             0.0f); // zero out the alpha by default
+
+        coll2D = gameObject.GetComponent<BoxCollider2D>();
+        coll2D.enabled = false; // ensure it's disabled from the get go
     }
-    
-    // appear during initialisation, in the correct position
 
     // expand in size, becoming more opaque and clear it is going to "blast"
     private bool Charge(float increment) {
@@ -62,6 +65,7 @@ public class Laser : Projectile {
         StopCoroutine(nameof(Shoot));
 
         beamRendererComponent.color = parentColor;
+        coll2D.enabled = true; // finally, deal damage
 
         yield return new WaitForSeconds(beamLifetime);
         
@@ -69,10 +73,8 @@ public class Laser : Projectile {
 
         yield return null;
     }
-    
-    // the beam should stick the barrel it is firing from, so it may need to move with owner
 
     private void Update() {
-        if (!Charge(Speed * Time.deltaTime)) ;
+        Charge(Speed * Time.deltaTime);
     }
 }
