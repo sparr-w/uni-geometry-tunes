@@ -13,7 +13,7 @@ public struct MoveObject : IComponentData {
 public class MoveSystem : ComponentSystem {
     protected override void OnUpdate() {
         Entities.WithAll<MoveObject>().ForEach((ref Translation trans, ref MoveObject move) => {
-            trans.Value += move.velocity * Time.DeltaTime;
+            trans.Value += move.velocity * Time.DeltaTime * 0.2f;
         });
     }
 }
@@ -37,18 +37,35 @@ public class ECSBulletSpawn : MonoBehaviour {
 
         entityManager.AddComponentData(entity, new Translation { Value = new float3(0.0f, 0.0f, 0.0f) });
         entityManager.AddComponentData(entity, new Rotation { Value = quaternion.identity });
-        entityManager.AddComponentData(entity, new Scale { Value = 1.0f });
+        entityManager.AddComponentData(entity, new Scale { Value = 0.2f });
         entityManager.AddComponentData(entity, new MoveObject());
         bulletPrototype = entity;
     }
 
-    public void Spawn(Vector3 position, Vector3 velocity) {
+    public void Spawn(Vector3 position, Quaternion rotation, Color color) {
         Entity newEntity = entityManager.Instantiate(bulletPrototype);
+
+        Material newMaterial = new Material(entityMaterial);
+        newMaterial.color = color;
+
+        var newDesc = new RenderMeshDescription(entityMesh, newMaterial);
+        RenderMeshUtility.AddComponents(newEntity, entityManager, newDesc);
+        
         entityManager.SetComponentData(newEntity, new Translation {
             Value = new float3(position.x, position.y, position.z) });
-        entityManager.SetComponentData(newEntity, new MoveObject {
-            velocity = new float3(velocity.x, velocity.y, velocity.z) });
 
+        Vector2 direction;
+        float angle = Mathf.Deg2Rad * (rotation.eulerAngles.z + 90.0f);
+
+        direction.x = Mathf.Cos(angle);
+        direction.y = Mathf.Sin(angle);
+        
+        entityManager.SetComponentData(newEntity, new MoveObject {
+            velocity = new float3(direction.x, direction.y, 0.0f) });
+        
+        entityManager.SetComponentData(newEntity, new Rotation {
+            Value = new quaternion(rotation.x, rotation.y, rotation.z, rotation.w) });
+        
         Count = Count + 1;
     }
 }

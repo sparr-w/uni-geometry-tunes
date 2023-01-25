@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -91,7 +92,15 @@ public class ShooterBehaviour : Enemy {
                 proj.transform.SetParent(this.transform);
                 break;
             case ProjectileHandlers.Entities:
-                entityHandler.Spawn(this.transform.position, Vector2.up);
+                Vector3 eRot = localRot.Value + this.transform.localEulerAngles;
+                Vector3 inheritPos = this.transform.position;
+                Vector3 ePos = inheritPos + localPos.Value;
+
+                float theta = Mathf.Deg2Rad * this.transform.localEulerAngles.z;
+                ePos.x = (Mathf.Cos(theta) * localPos.Value.x) - (Mathf.Sin(theta) * localPos.Value.y) + inheritPos.x;
+                ePos.y = (Mathf.Sin(theta) * localPos.Value.x) + (Mathf.Cos(theta) * localPos.Value.y) + inheritPos.y;
+
+                entityHandler.Spawn(ePos, Quaternion.Euler(eRot), OuterBodyColor);
                 return null;
                 break;
             default:
