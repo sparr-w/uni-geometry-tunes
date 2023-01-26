@@ -25,6 +25,7 @@ public class Enemy : MonoBehaviour {
     [Header("Enemy Movement Variables")]
     [SerializeField] protected EnemyMovementPatterns movementPattern = EnemyMovementPatterns.Static;
     [SerializeField] protected Vector2 directionOfTravel = new Vector2(1.0f, 0.0f);
+    [SerializeField] protected float distanceFromPlayer = 4.0f;
     [SerializeField] protected float moveSpeed = 0.0f;
 
     public bool SetColor(Color[] newColors) {
@@ -72,6 +73,24 @@ public class Enemy : MonoBehaviour {
         return this.transform.position;
     }
 
+    public Enemy InitMovement(float speed, EnemyMovementPatterns pattern, float angle = 90.0f, float distFromPlayer = 4.0f) {
+        this.moveSpeedMultiplier = speed;
+        this.movementPattern = pattern;
+        
+        // convert angle to directional vector for move direction
+        Vector2 dir;
+        angle = Mathf.Deg2Rad * (90.0f - angle);
+
+        dir.x = Mathf.Cos(angle);
+        dir.y = Mathf.Sin(angle);
+
+        this.directionOfTravel = dir.normalized;
+
+        this.distanceFromPlayer = distFromPlayer;
+        
+        return this;
+    }
+    
     protected virtual void Move() {
         switch (movementPattern) {
             case EnemyMovementPatterns.Static:
@@ -84,7 +103,7 @@ public class Enemy : MonoBehaviour {
                 break;
             case EnemyMovementPatterns.ChasePlayer:
                 if (GlobalVariables.Players[0] != null)
-                    MovePatternChase(GlobalVariables.Players[0].transform.position);
+                    MovePatternChase(GlobalVariables.Players[0].transform.position, distanceFromPlayer);
                 else Debug.LogWarning("There are no players to target!");
                 break;
         }
@@ -96,6 +115,9 @@ public class Enemy : MonoBehaviour {
 
     protected virtual void Update() {
         Move();
+        
+        if (GlobalVariables.OutOfBoundsCheck(transform))
+            Destroy(this.gameObject);
     }
     
     protected virtual void OnTriggerEnter2D(Collider2D other) { // most enemies will have a trigger collider, so when the player crashes into them, he should take damage

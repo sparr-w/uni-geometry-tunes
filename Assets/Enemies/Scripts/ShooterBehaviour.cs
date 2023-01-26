@@ -35,8 +35,9 @@ public class ShooterBehaviour : Enemy {
     protected Vector2 projScale = new Vector2(.3f, .3f);
 
     private Sprite projSprite;
+    private Shapes projShape;
     private ProjectilePool projectilePool;
-    private ECSBulletSpawn entityHandler;
+    private ECSProjectileManager entityHandler;
 
     protected virtual IEnumerator Shoot() {
         yield return 0;
@@ -68,7 +69,11 @@ public class ShooterBehaviour : Enemy {
         SetProjectileHandler(handler);
         return this;
     }
-    
+
+    public ShooterBehaviour SetProjectileShape(Shapes newShape) {
+        this.projShape = newShape;
+        return this;
+    }
     public ShooterBehaviour SetProjectileSprite(Sprite newSprite) {
         this.projSprite = newSprite;
         return this;
@@ -76,7 +81,7 @@ public class ShooterBehaviour : Enemy {
 
     protected override void Start() {
         projectilePool = FindObjectOfType<ProjectilePool>();
-        entityHandler = FindObjectOfType<ECSBulletSpawn>();
+        entityHandler = FindObjectOfType<ECSProjectileManager>();
     }
 
     protected Projectile FireProjectile(Vector3? localPos = null, Vector3? localRot = null) {
@@ -101,7 +106,7 @@ public class ShooterBehaviour : Enemy {
                 ePos.y = (Mathf.Sin(theta) * localPos.Value.x) + (Mathf.Cos(theta) * localPos.Value.y) + inheritPos.y;
 
                 entityHandler.Spawn(ePos, Quaternion.Euler(eRot), projScale.x * projScaleMultiplier, 
-                    projSpeed * projSpeedMultiplier, OuterBodyColor);
+                    projSpeed * projSpeedMultiplier, projShape, OuterBodyColor);
                 
                 return null;
             default:

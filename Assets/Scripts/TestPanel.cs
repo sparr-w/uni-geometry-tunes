@@ -22,14 +22,25 @@ public struct ShooterProjectileFields {
     public TMP_InputField ShotDelay, SpeedMultiplier, SizeMultiplier;
 }
 
+[System.Serializable]
+public struct EnemyConfigComponents {
+    public TMP_Dropdown EnemySelector;
+
+    public GameObject MovementPatternDropdown;
+
+    public GameObject DistanceFromPlayerField, MoveDirectionField;
+
+    public GameObject[] EnemyVariableComponents;
+}
+
 public class TestPanel : MonoBehaviour {
     [SerializeField] private EnemyHandler _enemyHandler;
     [Header("Components")]
     [SerializeField] private Image colourHandle;
     [SerializeField] private TMP_InputField speedMultiplierField;
     [SerializeField] private SpawnConfigComponents spawnConfigComponents;
-    [SerializeField] private GameObject[] enemyVariablesComponents;
     [SerializeField] private ShooterProjectileFields shooterProjectileFields;
+    [SerializeField] private EnemyConfigComponents enemyConfigComponents;
     private int enemyVarsEnabled = 0;
     
     private float defaultSpeed = 200.0f;
@@ -45,9 +56,9 @@ public class TestPanel : MonoBehaviour {
         rectTransform = this.GetComponent<RectTransform>();
 
         HandleHue(0.0f);
-
-        foreach (GameObject vars in enemyVariablesComponents) vars.SetActive(false);
-        enemyVariablesComponents[enemyVarsEnabled].SetActive(true);
+        
+        foreach (GameObject vars in enemyConfigComponents.EnemyVariableComponents) vars.SetActive(false);
+        enemyConfigComponents.EnemyVariableComponents[enemyVarsEnabled].SetActive(true);
     }
 
     private void Toggle(bool fromLeft = true) {
@@ -266,12 +277,27 @@ public class TestPanel : MonoBehaviour {
     }
     
     public void ShowEnemyVariables(int index) {
-        enemyVariablesComponents[enemyVarsEnabled].SetActive(false);
-        enemyVariablesComponents[index].SetActive(true);
+        enemyConfigComponents.EnemyVariableComponents[enemyVarsEnabled].SetActive(false);
+        enemyConfigComponents.EnemyVariableComponents[index].SetActive(true);
 
         enemyVarsEnabled = index;
     }
-    
+
+    public void UpdateMovementOptions(int value) {
+        if (value == 0) {
+            enemyConfigComponents.DistanceFromPlayerField.SetActive(false);
+            enemyConfigComponents.MoveDirectionField.SetActive(false);
+        }
+        else if (value == 1) {
+            enemyConfigComponents.DistanceFromPlayerField.SetActive(true);
+            enemyConfigComponents.MoveDirectionField.SetActive(false);
+        }
+        else if (value == 2) {
+            enemyConfigComponents.DistanceFromPlayerField.SetActive(false);
+            enemyConfigComponents.MoveDirectionField.SetActive(true);
+        }
+    }
+
     private void Update() {
         if (!isMoving) {
             if (Input.GetKeyDown(KeyCode.Comma)) Toggle(true);

@@ -169,6 +169,14 @@ public class EnemyHandler : MonoBehaviour {
         }
     }
 
+    private Sprite GetAssociatedSprite(Shapes shape) {
+        foreach (ProjectileShape pS in projectileShapes) {
+            if (pS.Shape == shape) return pS.Sprite;
+        }
+
+        return null;
+    }
+    
     private Vector2 EnemySpawnPosition {
         get {
             if (spawnRandom) {
@@ -196,6 +204,37 @@ public class EnemyHandler : MonoBehaviour {
         }
     }
 
+    private EnemyMovementPatterns enemyMovePattern = EnemyMovementPatterns.Static;
+    public Int32 DropdownEnemyMovePattern {
+        set {
+            if (value == 0) enemyMovePattern = EnemyMovementPatterns.Static;
+            else if (value == 1) enemyMovePattern = EnemyMovementPatterns.ChasePlayer;
+            else if (value == 2) enemyMovePattern = EnemyMovementPatterns.Direction;
+        }
+    }
+
+    private float chaseDistFromPlayer = 4.0f;
+    public string ChaseDistanceFromPlayer {
+        get { return "" + chaseDistFromPlayer; }
+        set {
+            if (Single.TryParse(value, out float i)) {
+                chaseDistFromPlayer = i;
+            }
+            else chaseDistFromPlayer = 4.0f;
+        }
+    }
+
+    private float directionMoveAngle = 90.0f;
+    public string DirectionMoveAngle {
+        get { return "" + directionMoveAngle; }
+        set {
+            if (Single.TryParse(value, out float i)) {
+                directionMoveAngle = i;
+            }
+            else directionMoveAngle = 90.0f;
+        }
+    }
+    
     #endregion
 
     #region Global Projectile Variables
@@ -255,6 +294,26 @@ public class EnemyHandler : MonoBehaviour {
             else if (value == 2) projectileHandler = ProjectileHandlers.Entities;
         }
     }
+
+    private Shapes projectileShape = Shapes.Circle;
+    public Int32 DropdownProjectileShape {
+        set {
+            if (value == 0) projectileShape = Shapes.Circle;
+            else if (value == 1) projectileShape = Shapes.Triangle;
+            else if (value == 2) projectileShape = Shapes.Square;
+        }
+    }
+
+    private int enemySelected = 0;
+    public Int32 EnemySelected {
+        set { enemySelected = value; }
+    }
+
+    public void SpawnEnemyButton() {
+        if (enemySelected == 0) SpawnSpinShooter();
+        else if (enemySelected == 1) SpawnTurret();
+        else if (enemySelected == 2) SpawnWorm();
+    }
     
     #endregion
     
@@ -294,9 +353,13 @@ public class EnemyHandler : MonoBehaviour {
         behaviourComponent.SetColor(BodyColors);
         behaviourComponent.Init(spinnerDirections, spinnerRotationMultiplier);
         
-        behaviourComponent.SetProjectileSprite(projectileShapes[2].Sprite);
+        behaviourComponent.SetProjectileShape(projectileShape);
+        behaviourComponent.SetProjectileSprite(GetAssociatedSprite(projectileShape));
+        
         behaviourComponent.InitProjectiles(projShotDelay, projSpeed, projSize);
         behaviourComponent.InitShooterProfile(shooterAttackType, projectileHandler);
+
+        behaviourComponent.InitMovement(enemySpeedMultiplier, enemyMovePattern, directionMoveAngle, chaseDistFromPlayer);
 
         return newShooter;
     }
@@ -323,10 +386,14 @@ public class EnemyHandler : MonoBehaviour {
         TurretBehaviour behaviourComponent = newShooter.GetComponent<TurretBehaviour>();
         behaviourComponent.SetColor(BodyColors);
         behaviourComponent.Init(enemySpeedMultiplier ,turretRotationSpeed);
-
-        behaviourComponent.SetProjectileSprite(projectileShapes[2].Sprite);
+        
+        behaviourComponent.SetProjectileShape(projectileShape);
+        behaviourComponent.SetProjectileSprite(GetAssociatedSprite(projectileShape));
+        
         behaviourComponent.InitProjectiles(projShotDelay, projSpeed, projSize);
         behaviourComponent.InitShooterProfile(shooterAttackType, projectileHandler);
+        
+        behaviourComponent.InitMovement(enemySpeedMultiplier, enemyMovePattern, directionMoveAngle, chaseDistFromPlayer);
 
         return newShooter;
     }
