@@ -100,9 +100,10 @@ public class ShooterBehaviour : Enemy {
                 ePos.x = (Mathf.Cos(theta) * localPos.Value.x) - (Mathf.Sin(theta) * localPos.Value.y) + inheritPos.x;
                 ePos.y = (Mathf.Sin(theta) * localPos.Value.x) + (Mathf.Cos(theta) * localPos.Value.y) + inheritPos.y;
 
-                entityHandler.Spawn(ePos, Quaternion.Euler(eRot), OuterBodyColor);
+                entityHandler.Spawn(ePos, Quaternion.Euler(eRot), projScale.x * projScaleMultiplier, 
+                    projSpeed * projSpeedMultiplier, OuterBodyColor);
+                
                 return null;
-                break;
             default:
                 switch (attackType) {
                     case AttackType.Laser:
