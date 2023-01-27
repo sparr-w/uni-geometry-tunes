@@ -8,18 +8,22 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private GameObject immunityBubbleComponent;
     [SerializeField] private SpriteRenderer bubbleRenderer;
     [SerializeField] private float immunityDuration = 1.0f;
-    
+
     private float moveSpeed = 5.0f, rotSpeed = 400.0f;
     private float horizontalInput = 0.0f, verticalInput = 0.0f;
     private int maxHitPoints = 10, hitPoints;
     private bool damageImmune = false;
     private float immunityElapsed = 0.0f;
     private Transform bodyComponent;
+    
+    private SpriteRenderer sRenderer;
 
     private void Start() {
         hitPoints = maxHitPoints;
         
         bodyComponent = transform.Find("Body");
+
+        sRenderer = bodyComponent.GetComponent<SpriteRenderer>();
 
 //        maskChunks = new Transform[maskChunksComponent.transform.childCount];
 //        for (int i = 0; i < maskChunks.Length; i++) // should add TR, BR, BL, TL
@@ -146,6 +150,7 @@ public class PlayerController : MonoBehaviour {
     private void Die() {
         // do some sort of simple death animation, explode? spin and shrink out of existence?
         damageImmune = true; // don't need to take more damage, prevent multiple calls of function
+        sRenderer.enabled = false;
     }
     
     private void Update() {

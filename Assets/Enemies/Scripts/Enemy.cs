@@ -20,6 +20,11 @@ public class Enemy : MonoBehaviour {
         get { return this.outerBodyColor; }
     }
 
+    private float lifeSpan = 0.0f;
+    private float lifeElapsed = 0.0f;
+
+    protected Color[] bodyColors = { Color.black, Color.white };
+
     [Space(10)]
     protected float moveSpeedMultiplier = 1.0f;
     [Header("Enemy Movement Variables")]
@@ -41,6 +46,8 @@ public class Enemy : MonoBehaviour {
                 part.color = newColors[0];
         }
 
+        bodyColors = newColors;
+        
         return true;
     }
 
@@ -90,6 +97,17 @@ public class Enemy : MonoBehaviour {
         
         return this;
     }
+
+    public void SetLifeSpan(float duration) {
+        this.lifeSpan = duration;
+    }
+    protected void HandleLifeSpan() {
+        if (lifeSpan > 0.0f) { // make sure that the enemy has a life span, otherwise it will live until another condition is met
+            lifeElapsed += Time.deltaTime;
+            
+            if (lifeElapsed >= lifeSpan) Destroy(this.gameObject);
+        }
+    }
     
     protected virtual void Move() {
         switch (movementPattern) {
@@ -109,23 +127,24 @@ public class Enemy : MonoBehaviour {
         }
     }
 
-    protected virtual void Start() {
-        throw new NotImplementedException();
-    }
-
     protected virtual void Update() {
         Move();
         
         if (GlobalVariables.OutOfBoundsCheck(transform))
             Destroy(this.gameObject);
+        
+        HandleLifeSpan();
+    }
+
+    protected virtual void AttackPlayer(PlayerController player) {
+        DamageReport damageReport = new DamageReport(1, this.transform.position);
+        player.DealDamage(damageReport);
     }
     
     protected virtual void OnTriggerEnter2D(Collider2D other) { // most enemies will have a trigger collider, so when the player crashes into them, he should take damage
         if (other.CompareTag("Player")) {
             PlayerController playerController = other.gameObject.GetComponent<PlayerController>();
-
-            DamageReport damageReport = new DamageReport(1, this.transform.position);
-            playerController.DealDamage(damageReport);
+            AttackPlayer(playerController);
         }
     }
 }

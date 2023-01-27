@@ -6,44 +6,44 @@ using UnityEngine;
 public class Projectile : MonoBehaviour {
     public float Speed = 1.0f;
 
-    protected Color parentColor = Color.white;
+    protected Color[] bodyColors = {Color.black, Color.white};
 
-    private SpriteRenderer spriteRenderer;
+    protected SpriteRenderer spriteRenderer;
 
-    private ProjectilePool associatedPool; private bool pooledObject = false;
-    public void SetAssociatedPool(ProjectilePool pool) {
-        associatedPool = pool;
-        pooledObject = true;
+    private bool pooledObject = false;
+    public void SetPooledObject(bool newValue) {
+        pooledObject = newValue;
     }
 
-    private void GetSpriteRenderer() { spriteRenderer = transform.GetChild(0).GetComponent<SpriteRenderer>(); }
+    protected virtual void GetSpriteRenderer() { spriteRenderer = transform.GetChild(0).GetComponent<SpriteRenderer>(); }
     
-    public void SetColor(Color newColor) {
+    public virtual void SetColors(Color[] newColors) {
         if (spriteRenderer == null) GetSpriteRenderer();
-        
-        spriteRenderer.color = parentColor = newColor;
+
+        spriteRenderer.color = newColors[1];
+        bodyColors = newColors;
     }
 
-    public void SetSprite(Sprite newShape) {
+    public virtual void SetSprite(Sprite newShape) {
         if (spriteRenderer == null) GetSpriteRenderer();
 
         spriteRenderer.sprite = newShape;
     }
 
-    public Projectile Init(float speed = 1.0f) {
+    public virtual Projectile Init(float speed = 1.0f) {
         this.Speed = speed;
         return this;
     }
 
-    private void Move(float distance) {
+    protected void Move(float distance) {
         this.transform.position += transform.up * distance;
     }
 
-    private void Update() {
+    protected virtual void Update() {
         Move(Speed * Time.deltaTime);
 
         if (GlobalVariables.OutOfBoundsCheck(this.transform)) {
-            if (pooledObject) associatedPool.ReturnUsedProjectile(this);
+            if (pooledObject) GlobalVariables.ProjectilePool.ReturnUsedProjectile(this);
             else Destroy(this.gameObject);
         }
     }

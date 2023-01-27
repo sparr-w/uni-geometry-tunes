@@ -15,7 +15,7 @@ public class ProjectilePool : MonoBehaviour {
             pool = new Projectile[capacity];
             for (int i = 0; i < capacity; i++) {
                 pool[i] = Instantiate(projectile, this.transform);
-                pool[i].SetAssociatedPool(this);
+                pool[i].SetPooledObject(true);
                 pool[i].gameObject.SetActive(false);
                 freeList.AddFirst(pool[i]);
             }
@@ -45,7 +45,7 @@ public class ProjectilePool : MonoBehaviour {
             }
             else {
                 newPool[i] = Instantiate(projectile, this.transform);
-                newPool[i].SetAssociatedPool(this);
+                newPool[i].SetPooledObject(true);
                 newPool[i].gameObject.SetActive(false);
             }
         }

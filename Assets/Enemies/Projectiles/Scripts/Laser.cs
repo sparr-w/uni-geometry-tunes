@@ -64,7 +64,7 @@ public class Laser : Projectile {
     private IEnumerator Blast() {
         StopCoroutine(nameof(Shoot));
 
-        beamRendererComponent.color = parentColor;
+        beamRendererComponent.color = bodyColors[1];
         coll2D.enabled = true; // finally, deal damage
 
         yield return new WaitForSeconds(beamLifetime);
@@ -74,7 +74,7 @@ public class Laser : Projectile {
         yield return null;
     }
 
-    private void Update() {
+    protected override void Update() {
         Charge(Speed * Time.deltaTime);
     }
 }

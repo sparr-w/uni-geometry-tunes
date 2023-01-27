@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -36,8 +37,6 @@ public class ShooterBehaviour : Enemy {
 
     private Sprite projSprite;
     private Shapes projShape;
-    private ProjectilePool projectilePool;
-    private ECSProjectileManager entityHandler;
 
     protected virtual IEnumerator Shoot() {
         yield return 0;
@@ -78,12 +77,7 @@ public class ShooterBehaviour : Enemy {
         this.projSprite = newSprite;
         return this;
     }
-
-    protected override void Start() {
-        projectilePool = FindObjectOfType<ProjectilePool>();
-        entityHandler = FindObjectOfType<ECSProjectileManager>();
-    }
-
+    
     protected Projectile FireProjectile(Vector3? localPos = null, Vector3? localRot = null) {
         // if the values aren't set (are null), give them default values -- this method is used because you cannot null regular vectors
         localPos ??= new Vector3(0.0f, 0.0f, 0.0f);
@@ -93,7 +87,7 @@ public class ShooterBehaviour : Enemy {
         // get/make new projectile
         switch (projectileHandler) {
             case ProjectileHandlers.Pooling:
-                proj = projectilePool.GetUnusedProjectile();
+                proj = GlobalVariables.ProjectilePool.GetUnusedProjectile();
                 proj.transform.SetParent(this.transform);
                 break;
             case ProjectileHandlers.Entities:
@@ -105,7 +99,7 @@ public class ShooterBehaviour : Enemy {
                 ePos.x = (Mathf.Cos(theta) * localPos.Value.x) - (Mathf.Sin(theta) * localPos.Value.y) + inheritPos.x;
                 ePos.y = (Mathf.Sin(theta) * localPos.Value.x) + (Mathf.Cos(theta) * localPos.Value.y) + inheritPos.y;
 
-                entityHandler.Spawn(ePos, Quaternion.Euler(eRot), projScale.x * projScaleMultiplier, 
+                GlobalVariables.EntityHandler.Spawn(ePos, Quaternion.Euler(eRot), projScale.x * projScaleMultiplier, 
                     projSpeed * projSpeedMultiplier, projShape, OuterBodyColor);
                 
                 return null;
@@ -132,7 +126,7 @@ public class ShooterBehaviour : Enemy {
             
             // return object to the pool
             if (projectileHandler == ProjectileHandlers.Pooling)
-                pTrans.SetParent(projectilePool.transform);
+                pTrans.SetParent(GlobalVariables.ProjectilePool.transform);
             else 
                 pTrans.SetParent(null);
         } 
@@ -143,7 +137,7 @@ public class ShooterBehaviour : Enemy {
         
         // initialise projectile
         proj.Init(projSpeed * projSpeedMultiplier);
-        proj.SetColor(OuterBodyColor);
+        proj.SetColors(bodyColors);
         
         // if pooling, set object to being used by making it active
         if (projectileHandler == ProjectileHandlers.Pooling)

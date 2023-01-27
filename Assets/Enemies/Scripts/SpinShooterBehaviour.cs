@@ -45,9 +45,7 @@ public class SpinShooterBehaviour : ShooterBehaviour {
         return this;
     }
     
-    protected override void Start() {
-        base.Start();
-        
+    protected void Start() {
         ShowHideBarrels();
     }
 

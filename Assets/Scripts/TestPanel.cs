@@ -26,7 +26,8 @@ public struct ShooterProjectileFields {
 public struct EnemyConfigComponents {
     public TMP_Dropdown EnemySelector;
 
-    public GameObject MovementPatternDropdown;
+    public GameObject DynamicMovementDropdown, DirectionalMoveDropdown;
+    public TMP_Dropdown TMPDynamicMoveDropdown;
 
     public GameObject DistanceFromPlayerField, MoveDirectionField;
 
@@ -281,6 +282,18 @@ public class TestPanel : MonoBehaviour {
         enemyConfigComponents.EnemyVariableComponents[index].SetActive(true);
 
         enemyVarsEnabled = index;
+        
+        // alter movement options appropriately -- this is done by hiding dynamic movement dropdown and showing one that is restricted
+        if (index >= 2) { // 2 should be worm
+            enemyConfigComponents.TMPDynamicMoveDropdown.value = 2;
+            
+            enemyConfigComponents.DynamicMovementDropdown.SetActive(false);
+            enemyConfigComponents.DirectionalMoveDropdown.SetActive(true);
+        }
+        else {
+            enemyConfigComponents.DynamicMovementDropdown.SetActive(true);
+            enemyConfigComponents.DirectionalMoveDropdown.SetActive(false);
+        }
     }
 
     public void UpdateMovementOptions(int value) {
@@ -293,6 +306,13 @@ public class TestPanel : MonoBehaviour {
             enemyConfigComponents.MoveDirectionField.SetActive(false);
         }
         else if (value == 2) {
+            enemyConfigComponents.DistanceFromPlayerField.SetActive(false);
+            enemyConfigComponents.MoveDirectionField.SetActive(true);
+        }
+    }
+
+    public void MoveDirectionMoveOptions(int value) {
+        if (value == 0) {
             enemyConfigComponents.DistanceFromPlayerField.SetActive(false);
             enemyConfigComponents.MoveDirectionField.SetActive(true);
         }

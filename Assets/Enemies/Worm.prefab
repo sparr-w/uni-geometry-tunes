@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 100264899230893333}
   - component: {fileID: 100264899230893330}
+  - component: {fileID: 279441266204214892}
+  - component: {fileID: 2474634489757726115}
   m_Layer: 0
   m_Name: Part
   m_TagString: Untagged
@@ -84,6 +86,34 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!58 &279441266204214892
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100264899230893332}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.475
+--- !u!114 &2474634489757726115
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100264899230893332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 094ef85abf6c67e4dbdc70a515d88440, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &100264899467274849
 GameObject:
   m_ObjectHideFlags: 0
@@ -134,6 +164,7 @@ MonoBehaviour:
   InnerBodyParts: []
   movementPattern: 1
   directionOfTravel: {x: 1, y: 0}
+  distanceFromPlayer: 4
   moveSpeed: 1
   sineFrequency: 1
   sineAmplitude: 1

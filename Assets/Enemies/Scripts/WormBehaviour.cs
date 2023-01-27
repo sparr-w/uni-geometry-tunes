@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class WormBehaviour : Enemy {
@@ -81,9 +82,13 @@ public class WormBehaviour : Enemy {
         return this.transform.position;
     }
 
-    protected override void Start() {
+    protected void Start() {
         startPos = this.transform.position;
+        Transform wormHead = transform.GetChild(0);
         
+        WormPartCollider wormColl = wormHead.GetComponent<WormPartCollider>();
+        wormColl.Init(this);
+
         OuterBodyParts = new SpriteRenderer[bodyPartCount];
         OuterBodyParts[0] = transform.GetChild(0).GetComponent<SpriteRenderer>();
         
@@ -91,8 +96,11 @@ public class WormBehaviour : Enemy {
         bodyParts = new Transform[bodyPartCount];
         for (int i = 0; i < bodyPartCount; i++) {
             if (i >= transform.childCount) {
-                GameObject newChild = Instantiate(transform.GetChild(0).gameObject, this.transform);
+                GameObject newChild = Instantiate(wormHead.gameObject, this.transform);
                 bodyParts[i] = newChild.transform;
+                
+                WormPartCollider newColl = newChild.GetComponent<WormPartCollider>();
+                newColl.Init(this);
                 
                 OuterBodyParts[i] = newChild.GetComponent<SpriteRenderer>();
             } else {
@@ -107,5 +115,11 @@ public class WormBehaviour : Enemy {
 
     protected override void Update() {
         MovePatternDirection(new Vector2(moveSpeed * moveSpeedMultiplier * Time.deltaTime, 0.0f));
+        
+        HandleLifeSpan();
+    }
+
+    public void CollisionFlag(PlayerController player) {
+        AttackPlayer(player);
     }
 }

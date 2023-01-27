@@ -19,9 +19,7 @@ public class TurretBehaviour : ShooterBehaviour {
         return this;
     }
     
-    protected override void Start() {
-        base.Start();
-        
+    protected void Start() {
         StartCoroutine(Shoot());
         barrelComponent = this.transform.GetChild(0).transform.GetChild(0); // this should, if the structure of turrets isn't tampered with, find the barrel component
     }
@@ -37,17 +35,7 @@ public class TurretBehaviour : ShooterBehaviour {
         
         return players[closestIndex];
     }
-    
-    protected override IEnumerator Shoot() {
-        yield return 0;
-        
-        while (isFiring) {
-            FireProjectile(new Vector3(0.0f, 0.0f, 0.0f));
 
-            yield return new WaitForSeconds(ShotDelay);
-        }
-    }
-    
     private void AimAtClosest() {
         // rotate barrel to face the player
         PlayerController target = TargetClosest();

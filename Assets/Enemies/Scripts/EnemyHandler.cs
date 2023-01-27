@@ -20,7 +20,7 @@ public class EnemyHandler : MonoBehaviour {
     [SerializeField] private ProjectileShape[] projectileShapes;
 
     [Header("Enemy Prefabs")] [SerializeField] private Transform WormPrefab;
-    [SerializeField] private Transform SpinShootPrefab, TurretPrefab, BossPrefab;
+    [SerializeField] private Transform SpinShootPrefab, TurretPrefab, BombPrefab, BossPrefab;
 
     private bool spawnRandom = true;
     public bool SpawnRandom {
@@ -235,6 +235,34 @@ public class EnemyHandler : MonoBehaviour {
         }
     }
     
+    private int enemySelected = 0;
+    public Int32 EnemySelected {
+        set {
+            enemySelected = value;
+            
+            // value comes from dropdown, order should be spin, turret, worm
+            if (value >= 2) {
+                enemyMovePattern = EnemyMovementPatterns.Direction;
+            }
+        }
+    }
+    public void SpawnEnemyButton() {
+        if (enemySelected == 0) SpawnSpinShooter();
+        else if (enemySelected == 1) SpawnTurret();
+        else if (enemySelected == 2) SpawnWorm();
+        else if (enemySelected == 3) SpawnBomb();
+    }
+
+    private float enemyLifeSpan = 0.0f;
+    public string EnemyLifeSpan {
+        get { return "" + enemyLifeSpan; }
+        set {
+            if (Single.TryParse(value, out float i))
+                enemyLifeSpan = i;
+            else enemyLifeSpan = 0.0f;
+        }
+    }
+    
     #endregion
 
     #region Global Projectile Variables
@@ -303,17 +331,6 @@ public class EnemyHandler : MonoBehaviour {
             else if (value == 2) projectileShape = Shapes.Square;
         }
     }
-
-    private int enemySelected = 0;
-    public Int32 EnemySelected {
-        set { enemySelected = value; }
-    }
-
-    public void SpawnEnemyButton() {
-        if (enemySelected == 0) SpawnSpinShooter();
-        else if (enemySelected == 1) SpawnTurret();
-        else if (enemySelected == 2) SpawnWorm();
-    }
     
     #endregion
 
@@ -330,7 +347,11 @@ public class EnemyHandler : MonoBehaviour {
 
         float multiplier;
         Vector2 notation = new Vector2(0.0f, 0.0f);
-        if (Mathf.Abs(nPos.x) > Mathf.Abs(nPos.y)) {
+
+        float xProp = Mathf.Abs(nPos.x) / GlobalVariables.ScreenBounds.x;
+        float yProp = Mathf.Abs(nPos.y) / GlobalVariables.ScreenBounds.y;
+        
+        if (xProp > yProp) {
             multiplier = GlobalVariables.ScreenBounds.x / Mathf.Abs(nPos.x);
             notation.x = nPos.x / Mathf.Abs(nPos.x);
         }
@@ -393,6 +414,8 @@ public class EnemyHandler : MonoBehaviour {
 
         behaviourComponent.InitMovement(enemySpeedMultiplier, enemyMovePattern, directionMoveAngle, chaseDistFromPlayer);
 
+        behaviourComponent.SetLifeSpan(enemyLifeSpan);
+        
         return newShooter;
     }
     public void SpawnSpinShooter() { SpawnSpinningShooter(EnemySpawnPosition); }
@@ -430,6 +453,8 @@ public class EnemyHandler : MonoBehaviour {
         behaviourComponent.InitShooterProfile(shooterAttackType, projectileHandler);
         
         behaviourComponent.InitMovement(enemySpeedMultiplier, enemyMovePattern, directionMoveAngle, chaseDistFromPlayer);
+
+        behaviourComponent.SetLifeSpan(enemyLifeSpan);
 
         return newShooter;
     }
@@ -494,9 +519,63 @@ public class EnemyHandler : MonoBehaviour {
         behaviourComponent.Init(enemySpeedMultiplier, wormBodyGap, wormBodyParts);
         behaviourComponent.InitPath(wormSineFreq, wormSineAmp);
 
+        behaviourComponent.SetLifeSpan(enemyLifeSpan);
+
         return newWorm;
     }
     public void SpawnWorm() { SpawnWorm(EnemySpawnPosition); }
+
+    #region Bomb Variables
+
+    private int bombShrapnelCount = 20;
+    public string BombShrapnelCount {
+        get { return "" + bombShrapnelCount; }
+        set {
+            if (Single.TryParse(value, out float i))
+                bombShrapnelCount = (int)i; // round whatever is passed through
+            else bombShrapnelCount = 20;
+        }
+    }
+
+    private float bombShrapnelProportion = 0.3f;
+    public string BombShrapnelProportion {
+        get { return "" + bombShrapnelProportion; }
+        set {
+            if (Single.TryParse(value, out float i))
+                bombShrapnelProportion = i;
+            else bombShrapnelProportion = 0.3f;
+        }
+    }
+
+    private float bombShrapnelSpeed = 2.0f;
+    public string BombShrapnelSpeed {
+        get { return "" + bombShrapnelSpeed; }
+        set {
+            if (Single.TryParse(value, out float i))
+                bombShrapnelSpeed = i;
+            else bombShrapnelSpeed = 2.0f;
+        }
+    }
+    
+    #endregion
+    
+    public Transform SpawnBomb() {
+        Transform newBomb = Instantiate(BombPrefab);
+
+        newBomb.transform.position = DirectionSpawnLocation();
+        newBomb.transform.localEulerAngles = new Vector3(0.0f, 0.0f, -directionMoveAngle);
+        
+        BombProjectile behaviourComponent = newBomb.GetComponent<BombProjectile>();
+        behaviourComponent.SetColors(BodyColors); // outer for now, change after appearance rework
+        behaviourComponent.InitBomb(projectileHandler, bombShrapnelCount, bombShrapnelProportion, bombShrapnelSpeed);
+        
+        behaviourComponent.SetSprite(GetAssociatedSprite(projectileShape));
+        behaviourComponent.SetShape(projectileShape);
+        
+        behaviourComponent.Init(enemySpeedMultiplier);
+
+        return newBomb;
+    }
     
     public Transform SpawnBoss(Vector2 spawnPos) {
         Transform newBoss = Instantiate(BossPrefab);

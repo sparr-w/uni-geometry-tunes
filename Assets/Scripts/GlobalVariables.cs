@@ -46,6 +46,20 @@ public class GlobalVariables : MonoBehaviour {
             return true;
         else return false;
     }
+
+    private static ProjectilePool projectilePool = FindObjectOfType<ProjectilePool>();
+    public static ProjectilePool ProjectilePool {
+        get {
+            return projectilePool;
+        }
+    }
+
+    private static ECSProjectileManager entityHandler = FindObjectOfType<ECSProjectileManager>();
+    public static ECSProjectileManager EntityHandler {
+        get { 
+            return entityHandler;
+        }
+    }
 }
 
 public struct DamageReport {
