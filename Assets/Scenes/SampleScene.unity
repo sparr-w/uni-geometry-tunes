@@ -4312,7 +4312,7 @@ GameObject:
   m_Component:
   - component: {fileID: 379452883}
   m_Layer: 5
-  m_Name: Movement Pattern
+  m_Name: Dynamic Move Patterns
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24157,7 +24157,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 797310083}
         m_TargetAssemblyTypeName: EnemyHandler, Assembly-CSharp
-        m_MethodName: set_DropdownEnemyMovePattern
+        m_MethodName: set_DropdownDynamicMovePattern
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

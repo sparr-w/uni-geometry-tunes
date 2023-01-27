@@ -205,7 +205,7 @@ public class EnemyHandler : MonoBehaviour {
     }
 
     private EnemyMovementPatterns enemyMovePattern = EnemyMovementPatterns.Static;
-    public Int32 DropdownEnemyMovePattern {
+    public Int32 DropdownDynamicMovePattern {
         set {
             if (value == 0) enemyMovePattern = EnemyMovementPatterns.Static;
             else if (value == 1) enemyMovePattern = EnemyMovementPatterns.ChasePlayer;
@@ -316,6 +316,34 @@ public class EnemyHandler : MonoBehaviour {
     }
     
     #endregion
+
+    private Vector2 DirectionSpawnLocation() {
+// use the similar equation seen in the object to get the directional vector for movement, apply it in reverse
+// multiply the values to the extreme so that they appear just off of the screen, and enter, heading directly across the screen
+        Vector2 nPos;
+        float nAngle = Mathf.Deg2Rad * (90.0f - directionMoveAngle);
+
+        nPos.x = Mathf.Cos(nAngle);
+        nPos.y = Mathf.Sin(nAngle);
+
+        nPos = nPos.normalized;
+
+        float multiplier;
+        Vector2 notation = new Vector2(0.0f, 0.0f);
+        if (Mathf.Abs(nPos.x) > Mathf.Abs(nPos.y)) {
+            multiplier = GlobalVariables.ScreenBounds.x / Mathf.Abs(nPos.x);
+            notation.x = nPos.x / Mathf.Abs(nPos.x);
+        }
+        else {
+            multiplier = GlobalVariables.ScreenBounds.y / Mathf.Abs(nPos.y);
+            notation.y = nPos.y / Mathf.Abs(nPos.y);
+        }
+
+        nPos = new Vector2(nPos.x * -multiplier, nPos.y * -multiplier);
+
+        nPos -= new Vector2(notation.x * 1.0f, notation.y * 1.0f); // replace 1.0f with enemy scale
+        return nPos;
+    }
     
     #region Spinning Shooter Variables
 
@@ -347,7 +375,11 @@ public class EnemyHandler : MonoBehaviour {
     
     public Transform SpawnSpinningShooter(Vector2 spawnPos) {
         Transform newShooter = Instantiate(SpinShootPrefab);
-        newShooter.transform.position = spawnPos;
+        
+        if (enemyMovePattern == EnemyMovementPatterns.Direction)
+            newShooter.transform.position = DirectionSpawnLocation();
+        else
+            newShooter.transform.position = spawnPos;
 
         SpinShooterBehaviour behaviourComponent = newShooter.GetComponent<SpinShooterBehaviour>();
         behaviourComponent.SetColor(BodyColors);
@@ -381,7 +413,11 @@ public class EnemyHandler : MonoBehaviour {
     
     public Transform SpawnTurret(Vector2 spawnPos) {
         Transform newShooter = Instantiate(TurretPrefab);
-        newShooter.transform.position = spawnPos;
+        
+        if (enemyMovePattern == EnemyMovementPatterns.Direction)
+            newShooter.transform.position = DirectionSpawnLocation();
+        else
+            newShooter.transform.position = spawnPos;
         
         TurretBehaviour behaviourComponent = newShooter.GetComponent<TurretBehaviour>();
         behaviourComponent.SetColor(BodyColors);
@@ -445,7 +481,13 @@ public class EnemyHandler : MonoBehaviour {
     
     public Transform SpawnWorm(Vector2 spawnPos) {
         Transform newWorm = Instantiate(WormPrefab);
-        newWorm.transform.position = spawnPos;
+
+        if (enemyMovePattern == EnemyMovementPatterns.Direction) {
+            newWorm.transform.localEulerAngles = new Vector3(0.0f, 0.0f, -directionMoveAngle + 90.0f);
+            newWorm.transform.position = DirectionSpawnLocation();
+        }
+        else
+            newWorm.transform.position = spawnPos;
         
         WormBehaviour behaviourComponent = newWorm.GetComponent<WormBehaviour>();
         behaviourComponent.SetColor(BodyColors);
